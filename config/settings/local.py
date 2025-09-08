@@ -35,3 +35,25 @@ EMAIL_HOST = getenv('EMAIL_HOST')
 EMAIL_PORT = getenv('EMAIL_PORT')
 DEFAULT_EMAIL_FROM = getenv('DEFAULT_FROM_EMAIL')
 DOMAIN = getenv('DOMAIN')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG',
+            'formatter': 'verbose',
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(name)-12s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            
+        }
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
