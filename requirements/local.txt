@@ -1,0 +1,6 @@
+-r base.txt
+
+pyscopg-binary==3.2.9
+watchfiles==1.1.0
+black==25.1.0
+
