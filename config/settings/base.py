@@ -34,7 +34,7 @@ THIRD_PARTY_APPS = [
     'rest_framework', 
     'django_countries', 
     'phonenumber_field', 
-    'drf_yasg', 
+    'drf_spectacular', 
     'djoser',
     'social_django',
     'taggit',

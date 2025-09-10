@@ -29,7 +29,7 @@ SECRET_KEY = getenv(
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0' ]
 
-ADIMN_URL = getenv('DJANGO_ADMIN_URL')
+ADMIN_URL = getenv('DJANGO_ADMIN_URL')
 EMAIL_BACKENG= 'djcelery_email.backends.CeleryEmailBackend'
 EMAIL_HOST = getenv('EMAIL_HOST')
 EMAIL_PORT = getenv('EMAIL_PORT')

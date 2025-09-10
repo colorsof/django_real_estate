@@ -1,6 +1,4 @@
 -r base.txt
 
-pyscopg-binary==3.2.9
-watchfiles==1.1.0
-black==25.1.0
-
+gunicorn==22.0.0
+psycopg2-binary==2.9.9
