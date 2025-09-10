@@ -29,7 +29,7 @@ services:
     image: estate_prod_postgres
     container_name: estate_prod_postgres
     ports:
-      - "5432:5432"
+      - "5433:5433"
     volumes:
       - estate_prod_postgres_data:/var/lib/postgresql/data
     env_file:
