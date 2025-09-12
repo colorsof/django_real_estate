@@ -151,3 +151,31 @@ STATIC_ROOT = str(BASE_DIR / 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 TAGGIT_CASE_INSENSITIVE = True
+
+AUTH_USER_MODEL = 'users.User'
+
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Alpha Apartments API',
+    'DESCRIPTION': 'An Apartment Management API for Real Estate',
+    'VERSION': 'v1',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'CONTACT': {
+        'email': 'bernadx90@gmail.com'
+    },
+    'LICENSE': {
+        'name': 'MIT License'
+    },
+}
+
+
+# Django REST Framework configuration
+REST_FRAMEWORK = {
+    # Use drf-spectacular's AutoSchema so schema views are compatible
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+
+
+
+

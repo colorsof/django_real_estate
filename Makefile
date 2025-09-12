@@ -4,6 +4,11 @@ build:
 up: 
 	docker compose -f local.yml up -d
 
+stop-pg:
+	sudo systemctl stop postgresql
+	# optionally disable the service so it doesn't start on boot
+	sudo systemctl disable postgresql
+
 down:
 	docker compose -f local.yml down
 
@@ -22,6 +27,9 @@ makemigrations:
 migrate:
 	docker compose -f local.yml run --rm api python manage.py migrate
 
+showmigrations:
+	docker compose -f local.yml run --rm api python manage.py showmigrations
+	
 collectstatic:
 	docker compose -f local.yml run --rm api python manage.py collectstatic --noinput --clear
 

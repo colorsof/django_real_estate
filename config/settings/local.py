@@ -1,3 +1,24 @@
+"""Local Django settings (development)
+
+This file is intended for local development and is loaded when
+`DJANGO_SETTINGS_MODULE` is set to `config.settings.local`.
+
+Purpose
+- Load environment variables from `.envs/.env.local` when present.
+- Provide development-friendly defaults (DEBUG=True).
+- Read and normalise `DJANGO_ADMIN_URL` so the admin site can be
+    exposed at a custom path (for example: `supersecret/`).
+
+Important environment variables
+- DJANGO_SECRET_KEY: overrides the default secret key.
+- DJANGO_ADMIN_URL: the path segment where admin is exposed. Examples:
+        - "supersecret/" -> admin available at /supersecret/
+        - "supersecret"  -> also works (will be normalized)
+
+Usage
+- Keep DEBUG=True for local dev. Do NOT use this file in production.
+"""
+
 from os import getenv, path
 
 from dotenv import load_dotenv
@@ -29,7 +50,13 @@ SECRET_KEY = getenv(
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0' ]
 
-ADMIN_URL = getenv('DJANGO_ADMIN_URL')
+# Read ADMIN_URL from env and normalize it to 'name/' form (no leading slash)
+_raw_admin = getenv('DJANGO_ADMIN_URL') or 'admin/'
+_admin_stripped = _raw_admin.strip('/')
+# e.g. 'supersecret/'
+ADMIN_URL = f"{_admin_stripped}/"
+# Ensure Django redirects to the configured admin login URL
+LOGIN_URL = f"/{_admin_stripped}/login/"
 EMAIL_BACKENG= 'djcelery_email.backends.CeleryEmailBackend'
 EMAIL_HOST = getenv('EMAIL_HOST')
 EMAIL_PORT = getenv('EMAIL_PORT')
