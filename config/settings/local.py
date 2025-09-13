@@ -45,6 +45,8 @@ SECRET_KEY = getenv(
     'rgJ4KsiINJjcmp-vBC8s2Kmvcw8Sh9oCRIuh6F-qUgyZGC3VbGE'
 )
 
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8080']
+
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
