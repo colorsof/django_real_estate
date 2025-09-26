@@ -1,8 +1,8 @@
 build:
-	docker compose -f local.yml up --build -d --remove-orphans
+	docker compose -f local.yml up --build -d --remove-orphans api postgres mailpit client redis celeryworker celerybeat flower nginx
 
 up: 
-	docker compose -f local.yml up -d
+	docker compose -f local.yml up -d api postgres mailpit client redis celeryworker celerybeat flower nginx
 
 stop-pg:
 	sudo systemctl stop postgresql
@@ -10,10 +10,10 @@ stop-pg:
 	sudo systemctl disable postgresql
 
 down:
-	docker compose -f local.yml down
+	docker compose -f local.yml down postgres mailpit client redis celeryworker celerybeat flower nginx
 
 down-v:
-	docker compose -f local.yml down -v
+	docker compose -f local.yml down -v postgres mailpit client redis celeryworker celerybeat flower nginx
 
 show-logs:
 	docker compose -f local.yml logs

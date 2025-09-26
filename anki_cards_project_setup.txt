@@ -1,0 +1,241 @@
+ANKI CARDS: Django Real Estate Project Setup
+==============================================
+
+Card 1: Docker Compose and Environment Files
+=============================================
+Q: How does local.yml load environment variables from .env.local?
+
+A: Via the `env_file` directive in each service:
+```yaml
+api:
+  env_file:
+    - ./.envs/.env.local
+```
+Docker Compose reads the .env.local file and injects all key=value pairs as environment variables into the container. The container process can then access them via `os.getenv()`.
+
+Card 2: Container File Mounting
+===============================
+Q: How does local.yml make your Python code available inside containers?
+
+A: Via volume mounts:
+```yaml
+api:
+  volumes:
+    - .:/app:z
+```
+This mounts the entire project directory (.) into /app inside the container, making all files (config/, manage.py, etc.) available at runtime.
+
+Card 3: Django Settings Module Selection
+========================================
+Q: How does Django know to use config.settings.local instead of config.settings.base?
+
+A: In manage.py:
+```python
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
+```
+This sets the default settings module. Django imports config.settings.local, which then imports base.py via `from .base import *`.
+
+Card 4: Django Settings Inheritance Chain
+==========================================
+Q: What's the relationship between base.py and local.py in Django settings?
+
+A: 
+- base.py: Contains common settings for all environments
+- local.py: Development-specific settings that imports base.py
+- local.py does: `from .base import *` (imports everything from base)
+- local.py then overrides/adds development-specific settings (DEBUG=True, etc.)
+
+Card 5: Environment Variable Loading in Django
+==============================================
+Q: How do environment variables from .env.local become available to Django settings?
+
+A: Two ways:
+1. Docker Compose injects them via `env_file` (primary method)
+2. local.py calls `load_dotenv()` as fallback for direct Python execution
+Both make variables accessible via `os.getenv('VARIABLE_NAME')` in settings files.
+
+Card 6: Container Startup Sequence
+==================================
+Q: What happens when the Django container starts up?
+
+A: 
+1. Container starts with command `/start`
+2. start.sh script runs:
+   - `python manage.py migrate` (apply database migrations)
+   - `python manage.py collectstatic` (gather static files)
+   - `python manage.py runserver 0.0.0.0:8000` (start development server)
+3. Django imports settings module (config.settings.local → base.py)
+
+Card 7: Next.js Service in Compose
+==================================
+Q: How is the Next.js client configured in local.yml?
+
+A:
+```yaml
+client:
+  build:
+    context: ./client
+    dockerfile: ./docker/local/Dockerfile
+  expose:
+    - "3000"
+  volumes:
+    - ./client:/app
+    - /app/node_modules
+```
+Builds from client/docker/local/Dockerfile, exposes port 3000, mounts client code.
+
+Card 8: Nginx Reverse Proxy Setup
+=================================
+Q: How does nginx route requests to Django API and Next.js client?
+
+A: nginx.conf location blocks:
+- `location /api/` → proxy_pass http://api (Django)
+- `location /supersecret` → proxy_pass http://api (Django admin)
+- `location /redoc` → proxy_pass http://api (API docs)
+- `location /swagger` → proxy_pass http://api (API docs)
+- `location /` → proxy_pass http://client (Next.js)
+- `location /static` → alias /app/staticfiles (static files)
+
+Card 9: Service Communication in Docker Network
+===============================================
+Q: How do nginx, api, and client containers communicate with each other?
+
+A: Via Docker Compose network (estate_prod_nw):
+- nginx reaches Django via `http://api:8000`
+- nginx reaches Next.js via `http://client:3000`
+- Service names (api, client) become hostnames within the network
+- Only nginx exposes external ports (8080:80)
+
+Card 10: Static Files Handling
+==============================
+Q: How are Django static files served through nginx?
+
+A: 
+1. Django collects static files to `/app/staticfiles` (STATIC_ROOT)
+2. Volume mount in both containers: `.staticfiles:/app/staticfiles`
+3. nginx serves them directly: `location /static { alias /app/staticfiles; }`
+4. Avoids hitting Django for static file requests (performance)
+
+Card 11: Environment File Structure
+===================================
+Q: What's the difference between .env.local and a top-level .env file?
+
+A:
+- `.envs/.env.local`: Service environment variables (injected into containers via `env_file`)
+- Top-level `.env`: Compose interpolation variables (used in ${VAR} syntax within local.yml)
+- .env.local contains runtime config (DB passwords, Django secret)
+- Top-level .env would contain build-time config (port numbers, image names)
+
+Card 12: Development vs Production Settings
+===========================================
+Q: How would you switch from local.py to production.py settings?
+
+A: Change DJANGO_SETTINGS_MODULE:
+- Development: `DJANGO_SETTINGS_MODULE=config.settings.local`
+- Production: `DJANGO_SETTINGS_MODULE=config.settings.production`
+Can set via environment variable in container or modify manage.py default.
+
+Card 13: CORS and API Access
+============================
+Q: Why does nginx add CORS headers to /api/ requests?
+
+A: Browser same-origin policy blocks cross-origin requests. Since:
+- Frontend served from http://localhost:8080 (nginx)
+- API docs (Redoc/Swagger) fetch schema from /api/schema/
+- nginx adds `Access-Control-Allow-Origin: *` to allow browser access
+- Enables API documentation to work in the browser
+
+Card 14: Build Context and Dockerfiles
+======================================
+Q: What's the difference between context and dockerfile in compose build config?
+
+A:
+```yaml
+build:
+  context: ./client          # Build context (files available during build)
+  dockerfile: ./docker/local/Dockerfile  # Path to Dockerfile
+```
+- context: Directory containing files for COPY/ADD instructions
+- dockerfile: Location of the Dockerfile (relative to repo root)
+- Build can access files in context, but Dockerfile can be anywhere
+
+Card 15: Volume Types and Node Modules
+======================================
+Q: Why does the client service have both a bind mount and anonymous volume?
+
+A:
+```yaml
+volumes:
+  - ./client:/app           # Bind mount (live code editing)
+  - /app/node_modules       # Anonymous volume (preserve installed packages)
+```
+- Bind mount syncs local code changes to container
+- Anonymous volume prevents node_modules from being overwritten by empty host directory
+- Enables hot reloading while preserving npm install results
+
+Card 16: Complete Request Flow
+=============================
+Q: Trace a request from browser to Django API through the complete stack.
+
+A:
+1. Browser → http://localhost:8080/api/schema/
+2. nginx (port 8080) receives request
+3. nginx location /api/ matches
+4. nginx proxy_pass http://api (internal network)
+5. Django container (api:8000) processes request
+6. Django uses config.settings.local (which imports base.py)
+7. Django accesses env vars from .env.local
+8. Response travels back: Django → nginx → browser
+
+Card 17: Service Dependencies
+============================
+Q: What's the purpose of depends_on in compose services?
+
+A:
+```yaml
+api:
+  depends_on:
+    - postgres
+    - mailpit
+```
+- Ensures postgres and mailpit start before api
+- Does NOT wait for services to be "ready" (just started)
+- Django container starts after database container exists
+- App still needs retry logic for database connections
+
+Card 18: Port Exposure Strategy
+==============================
+Q: Why do some services use 'ports' and others use 'expose'?
+
+A:
+- `ports: "8080:80"` → External access (host:container)
+- `expose: "8000"` → Internal network only
+- nginx uses ports (browser access needed)
+- api/client use expose (only nginx needs to reach them)
+- Security: minimizes external attack surface
+
+Card 19: Admin URL Configuration
+===============================
+Q: How is the Django admin URL customized in this project?
+
+A:
+1. .env.local: `DJANGO_ADMIN_URL="supersecret/"`
+2. local.py reads and normalizes it: `ADMIN_URL = f"{_admin_stripped}/"`
+3. urls.py uses it: `path(admin_path, admin.site.urls)`
+4. nginx routes it: `location /supersecret { proxy_pass http://api; }`
+5. Access admin at: http://localhost:8080/supersecret/
+
+Card 20: Complete Development Setup Checklist
+=============================================
+Q: What are the essential steps to run this project locally?
+
+A:
+1. Ensure .envs/.env.local has all required variables
+2. Build images: `docker compose -f local.yml build`
+3. Start services: `docker compose -f local.yml up`
+4. Apply migrations: `docker compose -f local.yml exec api python manage.py migrate`
+5. Create superuser: `docker compose -f local.yml exec api python manage.py createsuperuser`
+6. Access:
+   - API docs: http://localhost:8080/redoc/
+   - Admin: http://localhost:8080/supersecret/
+   - Frontend: http://localhost:8080/
