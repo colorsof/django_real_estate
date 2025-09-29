@@ -41,6 +41,8 @@ from pathlib import Path
 from os import getenv, path
 
 from dotenv import load_dotenv
+import cloudinary
+
 
 # ======================================================================
 # PROJECT DIRECTORY STRUCTURE
@@ -253,10 +255,9 @@ SITE_ID = 1
 # ======================================================================
 
 # URL prefix for static files (CSS, JavaScript, images)
-# Nginx serves these files directly in production for better performance
 STATIC_URL = '/static/'
 
-# Directory where collected static files are stored
+# Directory where collected static files are stored. Nginx serves these files directly in production for better performance
 # Used by 'python manage.py collectstatic' command
 STATIC_ROOT = str(BASE_DIR / 'staticfiles')
 
@@ -351,3 +352,12 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 CELERY_WORKER_SEND_TASK_EVENTS = True #send task related events to the backend
 
+CLOUDINARY_CLOUD_NAME= getenv("CLOUDINARY_CLOUD_NAME")
+CLOUDINARY_API_KEY= getenv("CLOUDINARY_API_KEY")
+CLOUDINARY_API_SECRET= getenv("CLOUDINARY_API_SECRET")
+cloudinary.config( 
+  cloud_name = CLOUDINARY_CLOUD_NAME, 
+  api_key = CLOUDINARY_API_KEY, 
+  api_secret = CLOUDINARY_API_SECRET,
+  
+)

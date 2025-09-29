@@ -1,0 +1,615 @@
+In this lecture we shall be creating a profile model.
+
+This profile model shall have an avatar field to serve our project media files.
+
+We shall be using Cloudinary.
+
+Cloudinary is a popular service for media and video management in the cloud.
+
+We could as well serve our media using nginx, but it's better to use a managed service like Cloudinary.
+
+It just handles a lot for us.
+
+Plus it has a free tier that we can use.
+
+So number one I create a Cloudinary account.
+
+Then after signing into your account, you just go to dashboard and then you're going to find your Cloudinary
+
+cloud name, your API key and your API secret.
+
+So these are the credentials are going to be adding to our dot env dot local file.
+
+So let's go back to our IDE.
+
+Then on env a local.
+
+At the bottom we can add cloudinary underscore cloud name.
+
+Mine is that.
+
+And then our cloudinary the Cloudinary underscore API underscore key.
+
+Add your API key so you can just go back to your dashboard and copy it, and then add your Cloudinary
+
+underscore API underscore secret.
+
+You also get this from your dashboard.
+
+After that is done, we can save this file.
+
+And then we are going to go to your env example file.
+
+And then we're just going to add the Cloudinary cloud name API key and secret key without any credentials.
+
+So scroll to the bottom, paste it in like that.
+
+And since we had already installed Cloudinary previously and also added it to the base dot poi third
+
+party app section, what you can do now is to configure Cloudinary at the bottom of the base.py file.
+
+So go back to the file.
+
+Let me go to base.py.
+
+Then let's just scroll to the bottom.
+
+Actually, let's first go to the top and have some inputs.
+
+And so scroll to the top and we're going to import Cloudinary like that.
+
+And then we're going to go to the bottom.
+
+But let's see let's see after yes after this task event we can say now Cloudinary.
+
+Let me just paste it to the Cloudinary cloud name.
+
+Also for the Cloudinary Cloud name, we're going to get it from our environment variables.
+
+Under environment variables Cloudinary cloud name the same.
+
+And then the secret key, the sim.
+
+So.
+
+Getenv.
+
+Then this is going to be Cloudinary API key.
+
+The same to the secret.
+
+This is going to be Cloudinary API secret.
+
+And then we can configure Cloudinary.
+
+So you can see Cloudinary dot config.
+
+And we're going to pass in the cloud name.
+
+So you can see cloud underscore name.
+
+This is going to be the cloudinary cloud name.
+
+Then the API underscore key is going to be the Cloudinary API key, and then the API underscore secret.
+
+It's going to be the Cloudinary API secret.
+
+And that's it for this file.
+
+So you can save the base.py file.
+
+And now we're going to be creating the profile model.
+
+So why are we creating the profiles model.
+
+And we already have our users model.
+
+Could we just have added everything to the user model we have instead of creating a separate profiles
+
+model.
+
+In my case I created both a users app.
+
+As you can see, users up under profiles up because of separation of concerns, which is best practice?
+
+Meaning we want the users app to handle models and functionality that are important for our user to
+
+have when authenticating with the application.
+
+The profile app can have models and functionality that relates to other fields that we want our user
+
+to have that are not directly linked to authentication.
+
+That is any extra information we want our users to have in our application and close all the open editors.
+
+Then we're going to go to co underscore apps and then profiles and then models.
+
+And then let's start with our visual with our imports.
+
+And so we can say from Auto Slug we're going to import the auto slug field.
+
+Then from Cloudinary dot models we're going to import.
+
+Your cloudinary field then from Django dot contrib.
+
+Dot Earth again to import.
+
+A gate user model.
+
+Then from Django to DB we're importing our models.
+
+Then from Django dot utils dot translation, we're going to import a get text lazy as underscore.
+
+And then from Django underscore countries a dot fields.
+
+We're going to import the country field.
+
+Then from a phone number, a phone number field, dot model fields.
+
+We're going to import the phone number field.
+
+And then you can see from co_apps.com on dot models.
+
+We're going to import the time stamped model.
+
+And then we can create an instance of a user.
+
+So you can say user is a get user model.
+
+You call that method.
+
+And then uh, let's start creating our models.
+
+And the first thing we're going to create, we're going to create a get username method which is going
+
+to return the user's username which will be used as the slug.
+
+And so you can see here define get underscore user underscore username like that.
+
+It's going to take in an instance which is going to be an instance of the profile.
+
+Let's say say profile like that in quotation marks.
+
+And then this function returns a string.
+
+And we can return an instance dot user dot username like that.
+
+And here the profile model is added in quotes.
+
+Since it's a forward reference.
+
+Forward references are used when the actual class hasn't been defined yet at the point in the code where
+
+you're making the reference.
+
+So at this point in time, we haven't created our profile model.
+
+That's why we're adding it in quotes as a forward reference.
+
+And now we can define our class profile like that.
+
+And it's going to subclass the timestamped model.
+
+As a reminder, we are creating this forward reference because at this point in the code, the profile
+
+model still didn't exist.
+
+So that's why it's a forward reference.
+
+Okay, let's work on our profile model.
+
+Our user profile is going to have a gender.
+
+As you can see class gender.
+
+This is going to be models dot uh text choices.
+
+And for here we're going to have male.
+
+And for male this is a tuple.
+
+And so you're going to have the first value of male.
+
+Then the human readable version is underscore.
+
+Mail like that.
+
+Then we're also going to do the same for female.
+
+So what you can do, you can just copy this male.
+
+Copy down once twice.
+
+And so this is going to be a female.
+
+Then this is female and then this is going to be.
+
+A female like that, then we're going to have other.
+
+So this can be other like that and then other like that and this becomes other.
+
+That's what our agenda.
+
+Then our profile is also going to have an occupation.
+
+Users are going to have an occupation.
+
+So you can see class occupation going to subclass models, dot text traces again.
+
+And now we're going to have a different occupations like a mason.
+
+So let me just paste in mail again.
+
+And this is going to be now uh Mason.
+
+Uh this changes to Mason.
+
+And this is a mason.
+
+Then paste again.
+
+We're going to have a carpenter.
+
+Then this changes to Carpenter.
+
+And let me just copy that and paste it in.
+
+The changes to Carpenter and then duplicate Carpenter now again to have plumber.
+
+And so you can just copy this.
+
+Can paste it in and paste it in.
+
+But this is a lowercase p like that.
+
+Then duplicate plumber.
+
+We're going to have a roofer.
+
+So roofer like that.
+
+Copy that.
+
+Paste it in.
+
+Paste it in.
+
+Lowercase.
+
+That.
+
+Roofer.
+
+Then duplicate it.
+
+We're also going to have a painter.
+
+So you can see a painter like that copy painter.
+
+Paste it in paste it in, make that lowercase.
+
+Then we're going to have an electrician.
+
+So you can just copy this, paste it in, paste it in lowercase that.
+
+Then you're going to have uh let's duplicate electrician.
+
+We're going to have HVAC.
+
+HVAC is just heating ventilation and air conditioning.
+
+So HVAC like that.
+
+Actually, let me make it uppercase.
+
+So it's like that.
+
+You can just, uh.
+
+Make this HVAC like that.
+
+And then copy HVAC can paste it in there.
+
+And then the last occupation is going to be a tenant.
+
+So it can be a tenant.
+
+Okay.
+
+Let me just, uh, duplicate HVAC then.
+
+We can paste that there.
+
+-- that there.
+
+And tenants know.
+
+It's not supposed to be in cups, actually.
+
+This is supposed to be tenants like that.
+
+And then we have tenants.
+
+And so with these text choices that we have created, uh, the first value is what is going to be stored
+
+in the database.
+
+The second value is the human readable version of the field.
+
+So that's why you have these two values for all these text choices.
+
+And so after the occupation takes place, we're going to have now the profile fields.
+
+We're going to have a user, and this user is going to be models dot 1 to 1 field with the user model.
+
+Then on delete we're going to say models dot Cascade.
+
+And the related name.
+
+It's going to be a profile like that.
+
+And so here are 1 to 1 field creates a 1 to 1 relationship with a user model, meaning that each instance
+
+of the profile model can be associated with exactly one instance of the user, and vice versa.
+
+Then we say on delete models dot cascade.
+
+Here we basically mean that if the user instance is deleted, the profile instance associated with that
+
+user should also be deleted.
+
+Then the related name profile creates a reverse relationship.
+
+Without this related name, you could access the profile from the user instance using an automatically
+
+generated name like user profile underscore set.
+
+However, by specifying this related name to profile, Django allows you to access the profile more
+
+intuitively with user dot profile.
+
+Then we're going to have an avatar field.
+
+And so for the avatar this is going to be the cloudinary field.
+
+Then the verbose name.
+
+And this is going to be avatar.
+
+This field can be blank.
+
+And this field can be null.
+
+And then we're going to have now the gender field.
+
+So for the gender this is going to be models dot character field.
+
+And for this field we're going to have a verbose name.
+
+The verbose name is going to be gender.
+
+Then the maximum length is going to be ten characters and then the choices.
+
+Now for the choices, we are now going to say gender dot choices.
+
+So where are we getting gender dot choices because of this.
+
+So gender dot choices.
+
+So that's how we're getting the gender field.
+
+And then the default value for this field if none is provided is going to be gender dot other.
+
+So if no gender is specified just go to the gender and select the other field like that.
+
+Then the user profile is going to have a bio.
+
+So bio is going to be models dot text field.
+
+The verbose name is uh let me make this.
+
+Let me see.
+
+And for the bio what can we do this you can just make this bio.
+
+We keep it simple bio.
+
+Then this field can be blank.
+
+And it can be null.
+
+Then the next field is occupation.
+
+And so what I can do I can just copy gender, then paste it down, then make this occupation.
+
+Also the occupation is going also going to be a character field.
+
+Now the verbose name changes to occupation.
+
+Then the maximum length is now 20.
+
+Then the chases.
+
+This time it's going to be occupation and the chases.
+
+And then the default occupation is going to be the tenant.
+
+So you can say this occupation dot a tenant.
+
+And just like that, then you're going to have a phone number field, as you can see here, phone underscore
+
+number.
+
+And this is going to be the phone number field with the verbose name.
+
+The verbose name is going to be phone number.
+
+And then the maximum length.
+
+You know this is going to be 30 and the default number is going to be let's say a plus 250, then uh
+
+784123456.
+
+Then the country of origin.
+
+We're going to have a country of origin filled, and this can be the from the country filled with the
+
+verbose name of country.
+
+Then the default.
+
+We have to provide a default country code.
+
+And so the country code, we can just say key for Kenya like that.
+
+Then the user is also going to have a city of origin.
+
+So city.
+
+Underscore of origin.
+
+And this is going to be models dot character field with a verbose name.
+
+Of city.
+
+Maximum length of 180.
+
+Um, the default, uh, let's provide the default city.
+
+Let's say the default city is Nairobi.
+
+Then we're going to have a report count field, which is going to keep track of the number of times
+
+a user has been reported.
+
+So you can say report count.
+
+You know this is going to be model stored integer field.
+
+The verbose name is going to be a report count.
+
+And the default is zero.
+
+And then their reputation also began to have a reputation field.
+
+So reputation.
+
+And this is going to be models.
+
+Integer field.
+
+Now with the verbose name.
+
+Of reputation.
+
+And a default value of 100.
+
+Then again, to have a slug filled as a slug is going to be an auto slug filled.
+
+And then are going to populate this slorg field from.
+
+So you say populate underscore from and they're going to be populating from our get user username method.
+
+And this get user username method is the one that we had created up above here.
+
+Then our slugs are going to be unique.
+
+So you can see unique.
+
+We can set that to a true like that.
+
+Then you save this file.
+
+Then I saw a warning.
+
+Here.
+
+Let me see.
+
+Uh, gender invalid syntax.
+
+Yes, because I forgot a comma.
+
+Uh.
+
+Right there.
+
+And so now if I save, it's okay.
+
+Then I also forgot a comma right there, I save it's now.
+
+Okay, so now we are good to go.
+
+Then we're going to have a property decorator.
+
+So at the bottom we can say add property.
+
+I'd explained this before so we should now be aware of what I'm trying to do here.
+
+So you can say define underscore ease band.
+
+This is going to take himself, and this function is going to return a boolean value.
+
+And here basically going to return a self dot report count.
+
+If it's greater than or equals to five, the user is declared as banned.
+
+So remember our application is going to support users reporting other tenants for misbehaviour or bad
+
+conduct.
+
+If your report count equals to five or more you're going to be banned from our application.
+
+We're going to work on that functionality when you get to the views.
+
+So don't worry.
+
+Then the next function is going to be define update reputation.
+
+This takes in self.
+
+And so remember, whenever a user is reporting another user, their reputation count is going to be
+
+deducted.
+
+And we start at a 100 from this reputation field.
+
+So let's update the reputation here.
+
+We're going to be subtracting 20 points from the reputation for each report.
+
+So you can see self.
+
+That reputation is going to be Max.
+
+Then zero the comma 100.
+
+You're going to subtract the self dot reports count.
+
+Multiplied by 20.
+
+And so here this max function ensures that the repetition does not go below zero.
+
+Then we're going to override the profile model save method to incorporate the repetition update logic
+
+whenever the model instance is saved.
+
+So you can see here define a save this text in self arguments and keyword arguments.
+
+Then we're going to say self dot update repetition.
+
+We're going to call that function to update the repetition.
+
+And then we now save the model instance.
+
+So you can say super dot save.
+
+We're passing in the argument and a keyword arguments.
+
+Then you save that.
+
+And that's it for this lecture with regards to creating the profile model, in the next lecture we're
+
+going to be handling the profile signals.
+
+
