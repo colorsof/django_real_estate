@@ -1,615 +1,379 @@
-In this lecture we shall be creating a profile model.
+We shall now be implementing token based authentication, user registration and account management.
 
-This profile model shall have an avatar field to serve our project media files.
+We shall be using the Jozsa package for this.
 
-We shall be using Cloudinary.
+By default, Jozsa sends an access and refresh tokens as part of the response body.
 
-Cloudinary is a popular service for media and video management in the cloud.
+For the kind of application we are building, we want these tokens returned as secure HTTP only cookies,
 
-We could as well serve our media using nginx, but it's better to use a managed service like Cloudinary.
+which is the standard right now.
 
-It just handles a lot for us.
+This is because in the front end, we don't want to store our tokens in local storage.
 
-Plus it has a free tier that we can use.
+Storing the tokens in local storage poses a security risk, since they can be accessed through client
 
-So number one I create a Cloudinary account.
+side JavaScript.
 
-Then after signing into your account, you just go to dashboard and then you're going to find your Cloudinary
+HTTP only cookies are considered more secure, but they also have their disadvantages.
 
-cloud name, your API key and your API secret.
+Always remember that when building software applications, it's all about trade offs.
 
-So these are the credentials are going to be adding to our dot env dot local file.
+No tool or strategy is 100% foolproof.
 
-So let's go back to our IDE.
+So first again to configure our cookies.
 
-Then on env a local.
+So where are we going to do that.
 
-At the bottom we can add cloudinary underscore cloud name.
+Go back to your IDE.
 
-Mine is that.
+Then let's close all this.
 
-And then our cloudinary the Cloudinary underscore API underscore key.
+And then we're going to go to our base dot pi file settings base dot pi file.
 
-Add your API key so you can just go back to your dashboard and copy it, and then add your Cloudinary
+And then at the bottom let's configure our cookies.
 
-underscore API underscore secret.
+So we're going to give our cookies a name.
 
-You also get this from your dashboard.
+And so you can say cookie underscore name.
 
-After that is done, we can save this file.
+And we're just going to call ours access like that.
 
-And then we are going to go to your env example file.
+We're going to have another setting for cookie underscore same site.
 
-And then we're just going to add the Cloudinary cloud name API key and secret key without any credentials.
+And we're going to set that to LAX just like that.
 
-So scroll to the bottom, paste it in like that.
+And so when setting the cookie samesite attribute to LAX, it means that the cookie will be sent with
 
-And since we had already installed Cloudinary previously and also added it to the base dot poi third
+the same site request.
 
-party app section, what you can do now is to configure Cloudinary at the bottom of the base.py file.
+And with cross-site top level navigations.
 
-So go back to the file.
+The lax setting provides a balance between security and usability.
 
-Let me go to base.py.
+It helps protect against CSRF attacks by not sending cookies with potentially dangerous cross-site requests,
 
-Then let's just scroll to the bottom.
+while still allowing the cookie to be sent to the top level navigations that are typically initiated
 
-Actually, let's first go to the top and have some inputs.
+by user actions.
 
-And so scroll to the top and we're going to import Cloudinary like that.
+And then we're going to set a cookie underscore path.
 
-And then we're going to go to the bottom.
+And again, to set that to slash just like that, by setting the cookie path to the slash, it means
 
-But let's see let's see after yes after this task event we can say now Cloudinary.
+you're setting the cookie path to the root, meaning the cookie will be available for all paths under
 
-Let me just paste it to the Cloudinary cloud name.
+the domain.
 
-Also for the Cloudinary Cloud name, we're going to get it from our environment variables.
+This is common for cookies that need to be accessed by the entire application.
 
-Under environment variables Cloudinary cloud name the same.
+Then we can say a cookie underscore HTTP only.
 
-And then the secret key, the sim.
+We're going to set that to a true.
 
-So.
+That's when a cookie is set with the httponly flag.
 
-Getenv.
+It means that the cookie cannot be accessed or manipulated by client side JavaScript.
 
-Then this is going to be Cloudinary API key.
+This restriction is enforced by the web browser.
 
-The same to the secret.
+If a web application is vulnerable to cross-site scripting attacks, the Httponly flag can help prevent
 
-This is going to be Cloudinary API secret.
+an attacker from gaining access to sensitive cookie session information.
 
-And then we can configure Cloudinary.
+And the next we're going to see cookie underscore secure.
 
-So you can see Cloudinary dot config.
+And we're going to set this to our environment variable.
 
-And we're going to pass in the cloud name.
+So you can say getenv.
 
-So you can see cloud underscore name.
+We're going to try to look for the cookie secure environment variable.
 
-This is going to be the cloudinary cloud name.
+If it doesn't exist we're going to set the default value to true.
 
-Then the API underscore key is going to be the Cloudinary API key, and then the API underscore secret.
+And we can equate that to true.
 
-It's going to be the Cloudinary API secret.
+So double equal sign and set that to true.
 
-And that's it for this file.
+So this cookie secure setting in Django determines whether cookies should be sent only over secure Https
 
-So you can save the base.py file.
+connections, or can be sent over both HTTP and Https connection.
 
-And now we're going to be creating the profile model.
+And so in cookie, secure is set to true.
 
-So why are we creating the profiles model.
+It means that cookies will only be sent over secure Https connections.
 
-And we already have our users model.
+This helps protect sensitive information, such as session cookies, from being intercepted or manipulated
 
-Could we just have added everything to the user model we have instead of creating a separate profiles
+by unauthorized parties.
 
-model.
+So here we are.
 
-In my case I created both a users app.
+We're seeing Getenv cookie secure is true.
 
-As you can see, users up under profiles up because of separation of concerns, which is best practice?
+We're going to retrieve the value of cookie secure from the environment variable.
 
-Meaning we want the users app to handle models and functionality that are important for our user to
+If the environment variable is not set, we're going to default it to true.
 
-have when authenticating with the application.
+Then double equal sign are true.
 
-The profile app can have models and functionality that relates to other fields that we want our user
+Compares the retrieved value or the default value.
 
-to have that are not directly linked to authentication.
+So these two values with the string of true.
 
-That is any extra information we want our users to have in our application and close all the open editors.
+If they are equal, the expression evaluates to true.
 
-Then we're going to go to co underscore apps and then profiles and then models.
+Otherwise it evaluates to false.
 
-And then let's start with our visual with our imports.
+And then here I made a mistake, a get rid of that bracket and that comma and that it's just supposed
 
-And so we can say from Auto Slug we're going to import the auto slug field.
+to be like this getenv cookie secure, then true.
 
-Then from Cloudinary dot models we're going to import.
+Then double equals true like that.
 
-Your cloudinary field then from Django dot contrib.
+Then you can save the base.py file.
 
-Dot Earth again to import.
+And as I mentioned before, Josa by default sends the access and refresh tokens as part of the response
 
-A gate user model.
+body for the application we are building.
 
-Then from Django to DB we're importing our models.
+We also want our tokens to be sent as cookies.
 
-Then from Django dot utils dot translation, we're going to import a get text lazy as underscore.
+So for this to happen we have to create a custom authentication class.
 
-And then from Django underscore countries a dot fields.
+This class will authenticate users via JWT tokens and return the tokens as cookies.
 
-We're going to import the country field.
+So we're going to go back to application, then go back to our common app.
 
-Then from a phone number, a phone number field, dot model fields.
+Also within command.
 
-We're going to import the phone number field.
+We're going to create a new file here.
 
-And then you can see from co_apps.com on dot models.
+Let's just rename tests in common.
 
-We're going to import the time stamped model.
+We can rename this to uh cookie underscore underscore auth dot pi.
 
-And then we can create an instance of a user.
+So this is under co underscore aps command.
 
-So you can say user is a get user model.
+Then cookie underscore auth dot pi.
 
-You call that method.
+Then let's create this custom authentication class.
 
-And then uh, let's start creating our models.
+As usual, we're going to start with our imports.
 
-And the first thing we're going to create, we're going to create a get username method which is going
+So you can import logging.
 
-to return the user's username which will be used as the slug.
+Then from typing we're going to import optional.
 
-And so you can see here define get underscore user underscore username like that.
+On the tuple.
 
-It's going to take in an instance which is going to be an instance of the profile.
+Then from Django conf we're going to import settings.
 
-Let's say say profile like that in quotation marks.
+Then from our Rest framework dot request we're going to import request.
 
-And then this function returns a string.
+Then from a Rest framework underscore simple JWT dot authentication.
 
-And we can return an instance dot user dot username like that.
+We're going to import a JWT authentication and the auth user.
 
-And here the profile model is added in quotes.
+Then from a Rest framework underscore simple JWT dot exceptions we're going to import the token error.
 
-Since it's a forward reference.
+And then from Rest framework and underscore simple JWT dot tokens we're going to import token.
 
-Forward references are used when the actual class hasn't been defined yet at the point in the code where
+Then create an instance of our logger.
 
-you're making the reference.
+So you can say logger is going to be logging dot get logger.
 
-So at this point in time, we haven't created our profile model.
+And here you can pass double underscore name.
 
-That's why we're adding it in quotes as a forward reference.
+And then create our authentication class.
 
-And now we can define our class profile like that.
+So you can see class I can call this cookie.
 
-And it's going to subclass the timestamped model.
+Authentication.
 
-As a reminder, we are creating this forward reference because at this point in the code, the profile
+It's going to subclass JWT authentication.
 
-model still didn't exist.
+Then we're going to override the authenticate method and return an optional tuple with the auth user.
 
-So that's why it's a forward reference.
+As you can see define authenticate it's going to take in self request with the type of request.
 
-Okay, let's work on our profile model.
+Then it's going to return an optional.
 
-Our user profile is going to have a gender.
+An optional tuple.
 
-As you can see class gender.
+So we have the square brackets with a auth user.
 
-This is going to be models dot uh text choices.
+Also can just get rid of all this with the auth user comma or the token.
 
-And for here we're going to have male.
-
-And for male this is a tuple.
-
-And so you're going to have the first value of male.
-
-Then the human readable version is underscore.
-
-Mail like that.
-
-Then we're also going to do the same for female.
-
-So what you can do, you can just copy this male.
-
-Copy down once twice.
-
-And so this is going to be a female.
-
-Then this is female and then this is going to be.
-
-A female like that, then we're going to have other.
-
-So this can be other like that and then other like that and this becomes other.
-
-That's what our agenda.
-
-Then our profile is also going to have an occupation.
-
-Users are going to have an occupation.
-
-So you can see class occupation going to subclass models, dot text traces again.
-
-And now we're going to have a different occupations like a mason.
-
-So let me just paste in mail again.
-
-And this is going to be now uh Mason.
-
-Uh this changes to Mason.
-
-And this is a mason.
-
-Then paste again.
-
-We're going to have a carpenter.
-
-Then this changes to Carpenter.
-
-And let me just copy that and paste it in.
-
-The changes to Carpenter and then duplicate Carpenter now again to have plumber.
-
-And so you can just copy this.
-
-Can paste it in and paste it in.
-
-But this is a lowercase p like that.
-
-Then duplicate plumber.
-
-We're going to have a roofer.
-
-So roofer like that.
-
-Copy that.
-
-Paste it in.
-
-Paste it in.
-
-Lowercase.
-
-That.
-
-Roofer.
-
-Then duplicate it.
-
-We're also going to have a painter.
-
-So you can see a painter like that copy painter.
-
-Paste it in paste it in, make that lowercase.
-
-Then we're going to have an electrician.
-
-So you can just copy this, paste it in, paste it in lowercase that.
-
-Then you're going to have uh let's duplicate electrician.
-
-We're going to have HVAC.
-
-HVAC is just heating ventilation and air conditioning.
-
-So HVAC like that.
-
-Actually, let me make it uppercase.
+Then get rid of this.
 
 So it's like that.
 
-You can just, uh.
+So define authenticate takes in self.
 
-Make this HVAC like that.
+Then the request returns an optional tuple with the auth user and the token.
 
-And then copy HVAC can paste it in there.
+And so fast.
 
-And then the last occupation is going to be a tenant.
+In this function we're going to attempt to retrieve the JWT token from the request header using the
 
-So it can be a tenant.
+get header method.
 
-Okay.
+So you can just say header is going to be a self dot get underscore header.
 
-Let me just, uh, duplicate HVAC then.
+It takes in the request.
 
-We can paste that there.
+Then we're going to initialize our raw token to none.
 
--- that there.
+So you can say raw underscore token.
 
-And tenants know.
+We can set this to none.
 
-It's not supposed to be in cups, actually.
+Then we're going to have an if condition, which is going to check if there's an authorization header.
 
-This is supposed to be tenants like that.
+If so, it's going to extract the row token using the row token method.
 
-And then we have tenants.
+So you can see if header.
 
-And so with these text choices that we have created, uh, the first value is what is going to be stored
+Is not none.
 
-in the database.
+Then the Ro token is going to be self dot get Ro token passing in the header.
 
-The second value is the human readable version of the field.
+Else if.
 
-So that's why you have these two values for all these text choices.
+In settings you can say settings dot cookie name.
 
-And so after the occupation takes place, we're going to have now the profile fields.
+So if the cookie name exists in request dot cookies, this Elif condition checks if a specific cookie
 
-We're going to have a user, and this user is going to be models dot 1 to 1 field with the user model.
+with the name specified in settings dot cookie name exists in the request.
 
-Then on delete we're going to say models dot Cascade.
+If the cookie exists, we are going to assign the value of the cookie to the row token, so we can say
 
-And the related name.
+if that exists, we're going to say row token and this is going to be a request.
 
-It's going to be a profile like that.
+Whoa.
 
-And so here are 1 to 1 field creates a 1 to 1 relationship with a user model, meaning that each instance
+Uh, request dot cookies.
 
-of the profile model can be associated with exactly one instance of the user, and vice versa.
+Dude, get your settings.
 
-Then we say on delete models dot cascade.
+Dude.
 
-Here we basically mean that if the user instance is deleted, the profile instance associated with that
+Cookingham.
 
-user should also be deleted.
+It just like that.
 
-Then the related name profile creates a reverse relationship.
+Then we're going to proceed.
 
-Without this related name, you could access the profile from the user instance using an automatically
+Now, if a raw JWT token is found either in the header or in the cookie, we're going to write code
 
-generated name like user profile underscore set.
+to attempt to validate it with the get validate method.
 
-However, by specifying this related name to profile, Django allows you to access the profile more
+As you can see, if this raw token is not none meaning it exists, we're going to have a try catch block.
 
-intuitively with user dot profile.
+So try not try catch.
 
-Then we're going to have an avatar field.
+This is not JavaScript.
 
-And so for the avatar this is going to be the cloudinary field.
+This is try except where in Python land.
 
-Then the verbose name.
+So this is try.
 
-And this is going to be avatar.
+Then you can have an accept block.
 
-This field can be blank.
+And so I think let's start with a try.
 
-And this field can be null.
+And so for the try block we can say the validated token.
 
-And then we're going to have now the gender field.
+Is going to be self dot get validated token.
 
-So for the gender this is going to be models dot character field.
+And you going to pass in our arrow token.
 
-And for this field we're going to have a verbose name.
+And then if the token is valid, we're going to return a tuple consisting of the user and the validated
 
-The verbose name is going to be gender.
+token.
 
-Then the maximum length is going to be ten characters and then the choices.
+This tuple is what will be used by the Django Rest framework to set the user and auth in the request,
 
-Now for the choices, we are now going to say gender dot choices.
+so we can return self dot get user.
 
-So where are we getting gender dot choices because of this.
+And you going to pass in the validated token and then comma and the validated token just like that.
 
-So gender dot choices.
+And then in the except block.
 
-So that's how we're getting the gender field.
+If an error occurs during token validation, such as if the token has expired or is invalid, we are
 
-And then the default value for this field if none is provided is going to be gender dot other.
+going to catch it using the token error exception.
 
-So if no gender is specified just go to the gender and select the other field like that.
+As you can see, except token error as e, we are going to log this so you can say logger dot error.
 
-Then the user profile is going to have a bio.
+And here we can see, let's say token a validation error.
 
-So bio is going to be models dot text field.
+Then we're going to pass in an error as a string.
 
-The verbose name is uh let me make this.
+So in curly braces we're going to say str.
 
-Let me see.
+Then passing the error.
 
-And for the bio what can we do this you can just make this bio.
+I just like that.
 
-We keep it simple bio.
+Then after I accept block and setting in our logger, we're now going to just enter B at the same level
 
-Then this field can be blank.
+as this if block.
 
-And it can be null.
+So at this level we're just going to return.
 
-Then the next field is occupation.
+None like that.
 
-And so what I can do I can just copy gender, then paste it down, then make this occupation.
+So at this level the authenticate method is returning none.
 
-Also the occupation is going also going to be a character field.
+If no token is found or if the token is invalid.
 
-Now the verbose name changes to occupation.
+So just countercheck and make sure you get the indentation right and this code right.
 
-Then the maximum length is now 20.
+If this custom class is a bit confusing, just take a time and go through it step by step.
 
-Then the chases.
+Then you can save our custom or cookie authentication class.
 
-This time it's going to be occupation and the chases.
+Then in our dot env local file we're going to add the Cookie Secure environment variable.
 
-And then the default occupation is going to be the tenant.
+So go back to envs.
 
-So you can say this occupation dot a tenant.
+Then MPs dot local.
 
-And just like that, then you're going to have a phone number field, as you can see here, phone underscore
+We're just going to go let's say above the Cloudinary stuff.
 
-number.
+And we're going to set a caps lock cookie underscore secure.
 
-And this is going to be the phone number field with the verbose name.
+And since we in development.
 
-The verbose name is going to be phone number.
+We're going to set this to false, and you're setting it to false to allow for cookies to be sent via
 
-And then the maximum length.
+HTTP.
 
-You know this is going to be 30 and the default number is going to be let's say a plus 250, then uh
+And since we're still in development, remember the settings we set the cookies secure to default to
 
-784123456.
+true and cookies secure.
 
-Then the country of origin.
+Defaulting to true means send cookies only via Https.
 
-We're going to have a country of origin filled, and this can be the from the country filled with the
+But since we're in development, we're setting this to false temporarily to allow cookies to be sent
 
-verbose name of country.
+over HTTP, which is not secure, but is what we are going to use for development.
 
-Then the default.
+In production.
 
-We have to provide a default country code.
+Of course, we're going to change this to true.
 
-And so the country code, we can just say key for Kenya like that.
+As you can save that file and then remember to do the same in the env example file.
 
-Then the user is also going to have a city of origin.
+Also you can copy that and go back to env dot example.
 
-So city.
+Then paste it in.
 
-Underscore of origin.
+Then just remove the value and then you save that file.
 
-And this is going to be models dot character field with a verbose name.
+And that's basically it for this lecture.
 
-Of city.
-
-Maximum length of 180.
-
-Um, the default, uh, let's provide the default city.
-
-Let's say the default city is Nairobi.
-
-Then we're going to have a report count field, which is going to keep track of the number of times
-
-a user has been reported.
-
-So you can say report count.
-
-You know this is going to be model stored integer field.
-
-The verbose name is going to be a report count.
-
-And the default is zero.
-
-And then their reputation also began to have a reputation field.
-
-So reputation.
-
-And this is going to be models.
-
-Integer field.
-
-Now with the verbose name.
-
-Of reputation.
-
-And a default value of 100.
-
-Then again, to have a slug filled as a slug is going to be an auto slug filled.
-
-And then are going to populate this slorg field from.
-
-So you say populate underscore from and they're going to be populating from our get user username method.
-
-And this get user username method is the one that we had created up above here.
-
-Then our slugs are going to be unique.
-
-So you can see unique.
-
-We can set that to a true like that.
-
-Then you save this file.
-
-Then I saw a warning.
-
-Here.
-
-Let me see.
-
-Uh, gender invalid syntax.
-
-Yes, because I forgot a comma.
-
-Uh.
-
-Right there.
-
-And so now if I save, it's okay.
-
-Then I also forgot a comma right there, I save it's now.
-
-Okay, so now we are good to go.
-
-Then we're going to have a property decorator.
-
-So at the bottom we can say add property.
-
-I'd explained this before so we should now be aware of what I'm trying to do here.
-
-So you can say define underscore ease band.
-
-This is going to take himself, and this function is going to return a boolean value.
-
-And here basically going to return a self dot report count.
-
-If it's greater than or equals to five, the user is declared as banned.
-
-So remember our application is going to support users reporting other tenants for misbehaviour or bad
-
-conduct.
-
-If your report count equals to five or more you're going to be banned from our application.
-
-We're going to work on that functionality when you get to the views.
-
-So don't worry.
-
-Then the next function is going to be define update reputation.
-
-This takes in self.
-
-And so remember, whenever a user is reporting another user, their reputation count is going to be
-
-deducted.
-
-And we start at a 100 from this reputation field.
-
-So let's update the reputation here.
-
-We're going to be subtracting 20 points from the reputation for each report.
-
-So you can see self.
-
-That reputation is going to be Max.
-
-Then zero the comma 100.
-
-You're going to subtract the self dot reports count.
-
-Multiplied by 20.
-
-And so here this max function ensures that the repetition does not go below zero.
-
-Then we're going to override the profile model save method to incorporate the repetition update logic
-
-whenever the model instance is saved.
-
-So you can see here define a save this text in self arguments and keyword arguments.
-
-Then we're going to say self dot update repetition.
-
-We're going to call that function to update the repetition.
-
-And then we now save the model instance.
-
-So you can say super dot save.
-
-We're passing in the argument and a keyword arguments.
-
-Then you save that.
-
-And that's it for this lecture with regards to creating the profile model, in the next lecture we're
-
-going to be handling the profile signals.
+In the next lecture we're going to be configuring the Rest framework and a simple JWT.
 
 
