@@ -375,6 +375,10 @@ DJOSER = {
           "SERIALIZERS": {
               "user_create": "core_apps.users.serializers.CreateUserSerializer",
           },
+          "PERMISSIONS": {
+              "user": ["djoser.permissions.CurrentUserOrAdmin"],
+              "user_list": ["rest_framework.permissions.IsAuthenticated"],
+          },
 }
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = getenv("GOOGLE_CLIENT_ID")

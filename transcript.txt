@@ -1,379 +1,629 @@
-We shall now be implementing token based authentication, user registration and account management.
+In this lecture we are going to configure JSON and Rest framework.
 
-We shall be using the Jozsa package for this.
+Simple JWT.
 
-By default, Jozsa sends an access and refresh tokens as part of the response body.
+And first we're going to create a signing key for our JSON web token.
 
-For the kind of application we are building, we want these tokens returned as secure HTTP only cookies,
+A JWT signing key is a secret cryptographic key that is used to sign a JWT.
 
-which is the standard right now.
+To verify its authenticity.
 
-This is because in the front end, we don't want to store our tokens in local storage.
+We are going to be using the Python Secrets package again.
 
-Storing the tokens in local storage poses a security risk, since they can be accessed through client
+So go back to terminal.
 
-side JavaScript.
+Then we can say Python.
 
-HTTP only cookies are considered more secure, but they also have their disadvantages.
+Uh, dash c import secrets.
 
-Always remember that when building software applications, it's all about trade offs.
+Run that command.
 
-No tool or strategy is 100% foolproof.
+We're going to get the secret key.
 
-So first again to configure our cookies.
+Then we're going to use this characters in the signing key environment variable that you're going to
 
-So where are we going to do that.
+create in the M local file.
 
-Go back to your IDE.
+So go back to envs then m dot local.
 
-Then let's close all this.
+Then after cookie secure here we can create a signing underscore key.
 
-And then we're going to go to our base dot pi file settings base dot pi file.
+Then go back to terminal.
 
-And then at the bottom let's configure our cookies.
+Let's copy that then paste it in.
 
-So we're going to give our cookies a name.
+Then you can save that.
 
-And so you can say cookie underscore name.
+Then also add this key to the MPs dot example file.
 
-And we're just going to call ours access like that.
+So copy this key.
 
-We're going to have another setting for cookie underscore same site.
+Go to Amazon example and paste it in and then add the quotation marks.
 
-And we're going to set that to LAX just like that.
+Then you save that file.
 
-And so when setting the cookie samesite attribute to LAX, it means that the cookie will be sent with
+Then we shall create a custom user serializer that will be used in the creation of users by Josa.
 
-the same site request.
+Since we are using a custom user model so you can go to co underscore apps and then users.
 
-And with cross-site top level navigations.
+Then again, create a new file.
 
-The lax setting provides a balance between security and usability.
+This file is going to be called Serializers dot pi.
 
-It helps protect against CSRF attacks by not sending cookies with potentially dangerous cross-site requests,
+And so this file is in users.
 
-while still allowing the cookie to be sent to the top level navigations that are typically initiated
+And then uh serializers dot p y like that.
 
-by user actions.
+Then as usual we're going to start with our inputs.
 
-And then we're going to set a cookie underscore path.
+So you can see from uh Django added contrib added auth.
 
-And again, to set that to slash just like that, by setting the cookie path to the slash, it means
+We're going to import a get user model.
 
-you're setting the cookie path to the root, meaning the cookie will be available for all paths under
+Then from a user uh dot.
 
-the domain.
+Uh serializers.
 
-This is common for cookies that need to be accessed by the entire application.
+We're going to import the user create serializer.
 
-Then we can say a cookie underscore HTTP only.
+Then you can say user is a get user model.
 
-We're going to set that to a true.
+And then we're going to create a class uh, which is going to be called uh create a user will create
 
-That's when a cookie is set with the httponly flag.
+user uh serializer.
 
-It means that the cookie cannot be accessed or manipulated by client side JavaScript.
+It's going to subclass the user create serializer.
 
-This restriction is enforced by the web browser.
+And then we're going to have a metaclass.
 
-If a web application is vulnerable to cross-site scripting attacks, the Httponly flag can help prevent
+As you can see class meta.
 
-an attacker from gaining access to sensitive cookie session information.
+And this is going to subclass the user create serializer dot meta.
 
-And the next we're going to see cookie underscore secure.
+Then the model to be used for this serializer is the user model.
 
-And we're going to set this to our environment variable.
+Then the fields we unserialized are the id field we username.
 
-So you can say getenv.
+Then the first name.
 
-We're going to try to look for the cookie secure environment variable.
+And then the last name.
 
-If it doesn't exist we're going to set the default value to true.
+And then the password.
 
-And we can equate that to true.
+And that's it for that serializer.
 
-So double equal sign and set that to true.
+With the serializer done back in our config settings based on py file, we're going to configure Rest
 
-So this cookie secure setting in Django determines whether cookies should be sent only over secure Https
+framework JSON and simple JWT.
 
-connections, or can be sent over both HTTP and Https connection.
+So let's go back to base and settings base.py.
 
-And so in cookie, secure is set to true.
+Then uh before we start configuring it down here let's go to the top and we're going to have some imports.
 
-It means that cookies will only be sent over secure Https connections.
+So go to scroll to the top.
 
-This helps protect sensitive information, such as session cookies, from being intercepted or manipulated
+And we're going to say from a date time.
 
-by unauthorized parties.
+We are going to import time Delta.
 
-So here we are.
+That's the only input.
 
-We're seeing Getenv cookie secure is true.
+Then you can scroll to the bottom and then a fast.
 
-We're going to retrieve the value of cookie secure from the environment variable.
+We're going to handle the Django Rest framework configuration.
 
-If the environment variable is not set, we're going to default it to true.
+And so you can see Rest underscore framework like that.
 
-Then double equal sign are true.
+It's going to be a dictionary.
 
-Compares the retrieved value or the default value.
+Then the first key is going to be a default underscore authentication underscore classes.
 
-So these two values with the string of true.
+We're going to be defining authentication classes.
 
-If they are equal, the expression evaluates to true.
+And this is going to take the value of core underscore apps dot common dot.
 
-Otherwise it evaluates to false.
+Then remember in our common app we had created our custom authentication class which is this cookie
 
-And then here I made a mistake, a get rid of that bracket and that comma and that it's just supposed
+authentication.
 
-to be like this getenv cookie secure, then true.
+That is going to be our default authentication class.
 
-Then double equals true like that.
+So we can say core underscore apps dot common dot cookie.
 
-Then you can save the base.py file.
+The folder is cookie underscore auth and the class is cookie authentication.
 
-And as I mentioned before, Josa by default sends the access and refresh tokens as part of the response
+Let me just copy this.
 
-body for the application we are building.
+That's it for that.
 
-We also want our tokens to be sent as cookies.
+Then you add a comma and after this, uh, this point here also add a comma because it's a tuple.
 
-So for this to happen we have to create a custom authentication class.
+And then we're going to have another key of default permission classes.
 
-This class will authenticate users via JWT tokens and return the tokens as cookies.
+And this is going to have a value of our Rest framework.
 
-So we're going to go back to application, then go back to our common app.
+The permissions.
 
-Also within command.
+A dot is authenticated.
 
-We're going to create a new file here.
+Then a comma there and a comma there.
 
-Let's just rename tests in common.
+So by default for API, users must be authenticated.
 
-We can rename this to uh cookie underscore underscore auth dot pi.
+So that's what you're setting there.
 
-So this is under co underscore aps command.
+Then we're going to set another one for default pagination class.
 
-Then cookie underscore auth dot pi.
+So let me just copy this.
 
-Then let's create this custom authentication class.
+La-based.
 
-As usual, we're going to start with our imports.
+Then this is going to be a default.
 
-So you can import logging.
+The pagination.
 
-Then from typing we're going to import optional.
+A class.
 
-On the tuple.
+Mod classes.
 
-Then from Django conf we're going to import settings.
+The default pagination class like that.
 
-Then from our Rest framework dot request we're going to import request.
+And I'm going to say this is going to be a racist remark.
 
-Then from a Rest framework underscore simple JWT dot authentication.
+Dot a pagination.
 
-We're going to import a JWT authentication and the auth user.
+Then we're going to be using page number pagination.
 
-Then from a Rest framework underscore simple JWT dot exceptions we're going to import the token error.
+And then you see that, and then we're going to declare our filter backends so we can say here no it's
 
-And then from Rest framework and underscore simple JWT dot tokens we're going to import token.
+default underscore filter underscore backends.
 
-Then create an instance of our logger.
+And this is going to be a list.
 
-So you can say logger is going to be logging dot get logger.
+And here we're going to be using our Django filter package.
 
-And here you can pass double underscore name.
+So you can say Django underscore filters dot rest underscore framework.
 
-And then create our authentication class.
+Dirt, jungle and filter backend.
 
-So you can see class I can call this cookie.
+And just like that.
 
-Authentication.
+Then for our rest remark, we want to set a page size for pagination purposes.
 
-It's going to subclass JWT authentication.
+As you can see here a page size.
 
-Then we're going to override the authenticate method and return an optional tuple with the auth user.
+The default pitch size is going to be ten.
 
-As you can see define authenticate it's going to take in self request with the type of request.
+And then we want to set up throttling.
 
-Then it's going to return an optional.
+And throttling is basically a way to limit the number of requests that can be made to the API.
 
-An optional tuple.
+And so we can say here a default.
 
-So we have the square brackets with a auth user.
+Underscore or throttle class.
 
-Also can just get rid of all this with the auth user comma or the token.
+Actually, it's classes like that.
 
-Then get rid of this.
+Sorry for that.
 
-So it's like that.
+Then here we can see.
 
-So define authenticate takes in self.
+The rest underscore framework.
 
-Then the request returns an optional tuple with the auth user and the token.
+Dot a throttling.
 
-And so fast.
+Dot anon rate throttle just like that.
 
-In this function we're going to attempt to retrieve the JWT token from the request header using the
+And so here this anon rate throttle is going to throttle users who are not authenticated with our API.
 
-get header method.
+These are anonymous users.
 
-So you can just say header is going to be a self dot get underscore header.
+And then after anon rate throttle we're going to have a Rest underscore framework.
 
-It takes in the request.
+And the throttling again at this time we're going to throttle or the authenticated user.
 
-Then we're going to initialize our raw token to none.
+So this is user rate a throttle like that.
 
-So you can say raw underscore token.
+And so basically here we're going to throttle authenticated users to a given rate of requests across
 
-We can set this to none.
+the API.
 
-Then we're going to have an if condition, which is going to check if there's an authorization header.
+We are now going to define the default throttle rates.
 
-If so, it's going to extract the row token using the row token method.
+So we can say here the default underscore throttle underscore rate.
 
-So you can see if header.
+And this is going to be a for anonymous users, that is users who are not authenticated with our API.
 
-Is not none.
+The throttling is going to be set to a 200 requests per day, and feel free to change these values depending
 
-Then the Ro token is going to be self dot get Ro token passing in the header.
+on the application you're building.
 
-Else if.
+And then for the authenticated users, it can be for our use case let's say 500 per day.
 
-In settings you can say settings dot cookie name.
+Then you can save the file.
 
-So if the cookie name exists in request dot cookies, this Elif condition checks if a specific cookie
+And that's it for our Rest framework configuration.
 
-with the name specified in settings dot cookie name exists in the request.
+So just make sure you get the spellings right.
 
-If the cookie exists, we are going to assign the value of the cookie to the row token, so we can say
+Let me just countercheck mine.
 
-if that exists, we're going to say row token and this is going to be a request.
+It looks good, but this is not correct.
 
-Whoa.
+This is authenticated.
 
-Uh, request dot cookies.
+I missed an eye and so it's authenticated like this.
 
-Dude, get your settings.
+Then check the rest.
 
-Dude.
+Check the rest.
 
-Cookingham.
+I think they're good.
 
-It just like that.
+Now we're going to configure simple JWT.
 
-Then we're going to proceed.
+As you can see here a simple underscore JWT.
 
-Now, if a raw JWT token is found either in the header or in the cookie, we're going to write code
+Then the first key is going to be our signing key.
 
-to attempt to validate it with the get validate method.
+And we're going to get this from an environment variable.
 
-As you can see, if this raw token is not none meaning it exists, we're going to have a try catch block.
+So you can say get env.
 
-So try not try catch.
+And remember our environment variable is also called signing key.
 
-This is not JavaScript.
+Then we're going to declare our access token lifetime.
 
-This is try except where in Python land.
+That is, how many minutes before our access tokens expire.
 
-So this is try.
+As you can see, access underscore token underscore lifetime.
 
-Then you can have an accept block.
+And we're going to use the time delta input we had imported up above.
 
-And so I think let's start with a try.
+So time delta and you want to access tokens to expire after 30 minutes.
 
-And so for the try block we can say the validated token.
+So you can say minutes is 30.
 
-Is going to be self dot get validated token.
+Uh, feel free to change this value depending on the application you're building.
 
-And you going to pass in our arrow token.
+Then the next one is going to be for the refresh token.
 
-And then if the token is valid, we're going to return a tuple consisting of the user and the validated
+As you can see I refresh.
 
-token.
+Whoa refresh underscore token underscore lifetime.
 
-This tuple is what will be used by the Django Rest framework to set the user and auth in the request,
+And this is going to be a time delta.
 
-so we can return self dot get user.
+I refresh tokens are supposed to expire much longer than access tokens.
 
-And you going to pass in the validated token and then comma and the validated token just like that.
+So for our application you can see our refresh tokens are going to expire after one day.
 
-And then in the except block.
+So you say days and you set that to one.
 
-If an error occurs during token validation, such as if the token has expired or is invalid, we are
+And then we can see here a rotate underscore refresh underscore tokens.
 
-going to catch it using the token error exception.
+And we can set that to true.
 
-As you can see, except token error as e, we are going to log this so you can say logger dot error.
+And so here we can refresh tokens is set to true.
 
-And here we can see, let's say token a validation error.
+If I refresh token is submitted to the token refresh view a new refresh token will be returned along
 
-Then we're going to pass in an error as a string.
+with the new access token.
 
-So in curly braces we're going to say str.
+Then the next one is going to be the user ID.
 
-Then passing the error.
+So you can see here user underscore ID underscore field.
 
-I just like that.
+And ours is the ID field.
 
-Then after I accept block and setting in our logger, we're now going to just enter B at the same level
+And so this user ID field is the database field from the user model that will be included in the generated
 
-as this if block.
+tokens to identify the users.
 
-So at this level we're just going to return.
+And so here we're going to be using our ID field.
 
-None like that.
+And then the next one is going to be a user user underscore ID underscore claim.
 
-So at this level the authenticate method is returning none.
+And this is going to be the user underscore ID.
 
-If no token is found or if the token is invalid.
+So this is the claim in generated tokens which will be used to store the user identifiers of for example
 
-So just countercheck and make sure you get the indentation right and this code right.
+a setting a value of user underscore ID would mean generated tokens include a user underscore ID claim
 
-If this custom class is a bit confusing, just take a time and go through it step by step.
+that contains the user's identifier, and then you save that.
 
-Then you can save our custom or cookie authentication class.
+That's it for our simple JWT configuration.
 
-Then in our dot env local file we're going to add the Cookie Secure environment variable.
+And the next we're going to be configuring JSON.
 
-So go back to envs.
+So you can just see here just like that.
 
-Then MPs dot local.
+And for JSON I'm just going to be copying some of these things.
 
-We're just going to go let's say above the Cloudinary stuff.
+So you can go to the JSON documentation.
 
-And we're going to set a caps lock cookie underscore secure.
+So first going to configure the user ID field.
 
-And since we in development.
+That's what I can say.
 
-We're going to set this to false, and you're setting it to false to allow for cookies to be sent via
+I can just copy that.
 
-HTTP.
+I'll bring it in.
 
-And since we're still in development, remember the settings we set the cookies secure to default to
+And so in quotation marks just say user ID field.
 
-true and cookies secure.
+We're going to the value to ID just like we did up above here.
 
-Defaulting to true means send cookies only via Https.
+And this is the name of the field in the user model that is used as the unique identifier.
 
-But since we're in development, we're setting this to false temporarily to allow cookies to be sent
+Then next we're just going to copy the login field.
 
-over HTTP, which is not secure, but is what we are going to use for development.
+So the login field for our application.
 
-In production.
+Is going to be email.
 
-Of course, we're going to change this to true.
+And this is basically the name of the field in the user model that is going to be used as the login
 
-As you can save that file and then remember to do the same in the env example file.
+field.
 
-Also you can copy that and go back to env dot example.
+If you go to the user documentation and this is the logging field we're talking about, then the next
 
-Then paste it in.
+one is going to be for the token model.
 
-Then just remove the value and then you save that file.
+So if we just scroll down we're going to get this token model and just copy it.
 
-And that's basically it for this lecture.
+And then paste it.
 
-In the next lecture we're going to be configuring the Rest framework and a simple JWT.
+This token model appoints to which token model should be used for authentication.
+
+In our case, since we're using stateless tokens, that is JWT tokens, we are going to set it to none.
+
+Then the next one is going to be user create password type.
+
+So you can just copy this here.
+
+Where is it user create password type.
+
+You just copy that, then go back, add it in.
+
+Then the value of this is going to be true.
+
+If this is set to true.
+
+You're going to need to pass the re underscore password to the users endpoint to validate password equality.
+
+Then the next one is going to be a send activation email.
+
+So you can just copy that and send activation email.
+
+Then you can set that to true.
+
+If this is set to true, the user is going to be required to click an activation link as sent in the
+
+email after creating an account or updating the email.
+
+And then the next one is going to be a password change email confirmation.
+
+So just copy paste it in here.
+
+We set that to true.
+
+Again.
+
+If this is set to true we're changing password endpoints.
+
+We'll send a confirmation email to the user.
+
+Then the next one is going to be a password reset confirm retype.
+
+So just copy it and paste it.
+
+Against this to true again.
+
+So basically, if this is true, you are going to need to pass the re underscore new underscore password
+
+field to the user's reset endpoint to validate password equality.
+
+Then the next turn you're going to get the activation URL.
+
+And we're going to set this to activate.
+
+Then pass in the a UID and the token just like that.
+
+And so this is basically going to be the URL for our front end activation page.
+
+And it should contain the UID and a token placeholders that you're going to populate when you get to
+
+the front end part of our application.
+
+And then the next one is password reset confirm URL and just copy it paste it in.
+
+We're going to set this one to a password.
+
+Hyphen reset.
+
+And then we're going to pass in our UID.
+
+And the token, and then the next one is for our social authentication.
+
+We are going to bring in this one which is social authentication allowed redirect URIs, which is basically
+
+a list of allowed redirect URIs for social authentication.
+
+And you can't get this from our environment variables.
+
+So you can say get env.
+
+And we're going to call this redirect underscore URIs.
+
+Then comma, then input, and then a quotation marks.
+
+And then we're going to call the split method.
+
+So dot split and I'm going to split it at the comma go.
+
+We're going to split it at the comma because it's a list.
+
+And then next we're going to define our serializer.
+
+So you can see Serializers.
+
+Whoa Serializers.
+
+And here for JSON.
+
+We're going to bring in our custom serializer that we had created.
+
+So if you go to the JSON documentation under Serializers, it allows you to create your own Serializers
+
+and then map them to this serializer dictionary.
+
+And so that's what you're doing.
+
+And this Serializers have particular keys that you have to use.
+
+So for our case we're going to change the user create serializer which is right here user create.
+
+So you can go back here and I'm going to say for the user underscore create key.
+
+We're going to provide our custom serializer.
+
+Our custom serializer is in core underscore apps dot users dot Serializers dot wait called it create
+
+user and serializer.
+
+Then you save that file.
+
+Then we're going to configure social auth.
+
+And in our case we're going to allow users to also authenticate using Google.
+
+And so at the bottom here we can say uh uh social underscore auth underscore Google underscore auth
+
+two and hyphen key.
+
+And remember we're doing this outside JSON.
+
+So make sure it's after this curly brace then this one.
+
+Then for this key we're going to get it from our environment variables.
+
+And we're going to call this Google underscore client underscore ID.
+
+We're going to create this credentials when we set up our app on Google.
+
+So don't worry about that.
+
+Then the next one is going to be and let me copy social auth key paste it in.
+
+So it's social underscore auth underscore Google auth two.
+
+Now this is the secret.
+
+And is going to be getenv.
+
+And we're going to call this Google.
+
+Underscore.
+
+Client.
+
+Underscore.
+
+Secret.
+
+And then the next one.
+
+Let's just paste again its social auth underscore Google underscore oauth2.
+
+Then this is now the scope.
+
+Home.
+
+This is going to be a list.
+
+So here, when defining our scope, we want to define what values we want to get from Google.
+
+And in our case, we just want to get the user's email and the user's profile and their OpenID.
+
+So you can see here https double colon w w w dot Google api's dot com slash auth slash user info.
+
+That email.
+
+And then a Https.
+
+It's just the same thing.
+
+Let me just copy this again.
+
+We paste it in.
+
+Also it is auth then user info.
+
+Now this time it is profile.
+
+And then and lastly, it's open and it's just like that.
+
+And then the next one is going to be just copy that.
+
+Had he done.
+
+So it's going to be social underscore auth underscore Google underscore auth.
+
+Then this is going to change to extra data.
+
+And which extra data do you want to get?
+
+We want to get there a first name.
+
+And the last underscore name.
+
+So here in the scope we want the user's email and the profile.
+
+And for the next data we want from Google you want the a first name and the last name.
+
+And that's it for this configuration.
+
+So please make sure you get the uh spellings correct.
+
+Don't make mistakes like you have seen me doing before.
+
+And you should be good to go.
+
+And that's it for configuration.
+
+Now we can go back to our terminal and build our containers.
+
+Now that you've added new environment variables.
+
+So go back to your terminal and you can run.
+
+A social mixer and the root directory.
+
+Then now you can run.
+
+Make a build.
+
+Good.
+
+So go back to Docker Desktop and confirm that everything is okay.
+
+As you can see, everything is green so we are good to go.
+
+It means you've set up things correctly.
+
+And with that done, we can go back to our git client and commit our code.
+
+So go back to your git client here and you can see this is a chore.
+
+Now let's say add a user a simple JWT.
+
+And rest of framework settings.
+
+And then you make the commit.
+
+And that's it for this lecture.
+
+In the next lecture we're going to be covering auth views.
 
 
