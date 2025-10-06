@@ -375,6 +375,7 @@ DJOSER = {
           
           "SERIALIZERS": {
               "user_create": "core_apps.users.serializers.CreateUserSerializer",
+              "current_user": "core_apps.users.serializers.CustomUserSerializer",
           },
           "PERMISSIONS": {
               "user": ["djoser.permissions.CurrentUserOrAdmin"],
