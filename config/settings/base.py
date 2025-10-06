@@ -335,13 +335,14 @@ REST_FRAMEWORK ={
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
     ),
-    "DEFAULT_PAGINATION_CLASS": ("rest_framework.pagination.PageNumberPagination",    
-    ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",    
+    "PAGE_SIZE": 10,
+    
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",
         
     ],
-    "PAGE_SIZE": 10,
+    
     "DEFAULT_THROTTLE_CLASSES": (
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
@@ -371,7 +372,7 @@ DJOSER = {
           "PASSWORD_RESET_CONFIRM_RETYPE": True,
           "ACTIVATION_URL": "activate/{uid}/{token}",
           "PASSWORD_RESET_CONFIRM_URL": "password-reset/{uid}/{token}",
-          "SOCIAL_AUTH_ALLOWED_REDIRECT_URIS": getenv("REDIRECT_URIS", "").split(","),
+          
           "SERIALIZERS": {
               "user_create": "core_apps.users.serializers.CreateUserSerializer",
           },
@@ -380,13 +381,19 @@ DJOSER = {
               "user_list": ["rest_framework.permissions.IsAuthenticated"],
           },
 }
+SOCIAL_AUTH_ALLOWED_REDIRECT_URIS = getenv("REDIRECT_URIS", "").split(",")
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = getenv("GOOGLE_CLIENT_ID")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = getenv("GOOGLE_CLIENT_SECRET")
-SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPER = [
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     "https://www.googleapis.com/auth/userinfo.email",
     "https://www.googleapis.com/auth/userinfo.profile",
     "openid",
 ]
 SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ["first_name", "last_name"]
+
+AUTHENTICATION_BACKENDS = [
+    "social_core.backends.google.GoogleOAuth2",  # Google OAuth2 backend
+    "django.contrib.auth.backends.ModelBackend",  # Default Django auth backend
+]
 
