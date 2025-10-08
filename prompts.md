@@ -11,5 +11,6 @@ I need a good explanation of routing in django not necessarily how cookies are a
 
 
 
-great can you make anki cards starting from where I asked you to explain how routing and urls work in django. When thinking of the questions bear in mind that I use anki for a long period thus the question
- must make sense independently 
+great can you make anki cards for these files @core_apps/profiles/pipeline.py, @core_apps/profiles/serializers.py, @.core_apps/common/renderers.py
+@ core_apps/profiles/urls.py, @core_apps/profiles/tasks.py, @core_apps/profiles/views.py
+When thinking of the questions bear in mind that I use anki for a long period thus the question  must make sense independently Secondly the answer should not be long. Structure questions well so that the answers are less than 50 words if possible less than 20 words.

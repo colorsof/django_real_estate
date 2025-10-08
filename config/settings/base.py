@@ -70,6 +70,7 @@ LOCAL_APPS = [
     'core_apps.common',   # Shared models and utilities across apps
     'core_apps.issues',   # Issue reporting and tracking system
     'core_apps.posts',    # Property listings and blog posts
+    'core_apps.apartments', # Apartment-specific models and logic
 ]
  
 # Complete list of installed applications
