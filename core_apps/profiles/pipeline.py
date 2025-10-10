@@ -8,5 +8,5 @@ def save_profile(backend,user, response, *args, **kwargs):
         if avatar_url:
             upload_result = cloudinary.uploader.upload(avatar_url)
             profile, created = Profile.objects.get_or_create(user=user)
-            profile.avatar = upload_result('public_id')
+            profile.avatar = upload_result['public_id']
             profile.save()

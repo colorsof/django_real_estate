@@ -22,6 +22,7 @@ urlpatterns = [
     #path("api/v1/auth/", include("social_django.urls", namespace="social")),  # Social auth URLs
     path("api/v1/profiles/", include("core_apps.profiles.urls")),
     path("api/v1/apartment/", include("core_apps.apartments.urls")),  # Apartment app URLs
+    path("api/v1/issues/", include("core_apps.issues.urls")),  # Issues app URLs
 ]
 
 admin.site.site_header = "Real Estate Admin"

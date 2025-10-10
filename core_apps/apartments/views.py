@@ -24,22 +24,13 @@ class ApartmentCreateAPIView(generics.CreateAPIView):
                 "message": "Only superusers or tenants can create apartments."
             }, status=403)
 
-class ApartmentDetailAPIView(generics.RetrieveAPIView):
+class ApartmentDetailAPIView(generics.ListAPIView):
     serializer_class = ApartmentSerializer
     renderer_classes = [GenericJSONRenderer]
     object_label = 'Apartment'
-    
-    
-    def get_object(self) -> Apartment:
-        queryset = self.request.user.apartment.all()
-        obj = generics.get_object_or_404(queryset)
-        return obj
-    
-    
-    # def get_queryset(self)-> Apartment:
-    #     queryset = self.request.user.apartment.all() #what does this do
-    #     #obj = generics.get_object_or_404(queryset)
-    #     return queryset
+
+    def get_queryset(self):
+        return self.request.user.apartment.all()
         
         
         
