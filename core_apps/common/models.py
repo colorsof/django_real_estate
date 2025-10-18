@@ -62,14 +62,15 @@ class ContentView(TimeStampedModel):
             
         @classmethod #this is a class method can be called on the class itself without instantiating an object of the class
         def record_view(cls, content_object, user:User, viewer_ip: str) -> None:
+            from django.utils import timezone
             content_type = ContentType.objects.get_for_model(content_object)
             try:
-                view, created = cls.objects.get_or_create(
+                view, created = cls.objects.update_or_create(
                     content_type = content_type,
                     object_id=content_object.pkid,
-                    defaults={'user': user, 'viewer_ip': viewer_ip},
+                    user=user,
+                    viewer_ip=viewer_ip,
+                    defaults={'last_viewed': timezone.now()},
                 )
-                if not created:
-                    pass
             except IntegrityError:
                 pass

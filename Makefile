@@ -12,8 +12,8 @@ stop-pg:
 down:
 	docker compose -f local.yml down postgres mailpit client redis celeryworker celerybeat flower nginx
 
-down-v:
-	docker compose -f local.yml down -v postgres mailpit client redis celeryworker celerybeat flower nginx
+# down-v:
+# 	docker compose -f local.yml down -v postgres mailpit client redis celeryworker celerybeat flower nginx
 
 show-logs:
 	docker compose -f local.yml logs

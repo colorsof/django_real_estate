@@ -47,7 +47,7 @@ class Issue(TimeStampedModel):
         on_delete=models.SET_NULL, 
         null=True, 
         blank=True,
-        related_name='assigned_to_issues',
+        related_name='assigned_to_issues', 
         verbose_name=_('Assigned To'),
     )
     title = models.CharField(max_length=255, verbose_name=_('Title'))

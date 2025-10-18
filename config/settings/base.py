@@ -71,6 +71,7 @@ LOCAL_APPS = [
     'core_apps.issues',   # Issue reporting and tracking system
     'core_apps.posts',    # Property listings and blog posts
     'core_apps.apartments', # Apartment-specific models and logic
+    'core_apps.reports',  # Reputation tenants field. Report other tenants.
 ]
  
 # Complete list of installed applications

@@ -107,17 +107,9 @@ class IssueDetailAPIView(generics.RetrieveAPIView):
         return issue
     
     def  record_issue_view(self, issue):
-        content_type = ContentType.objects.get_for_model(issue)
         viewer_ip = self.get_client_ip()
         user = self.request.user
-        
-        obj, created = ContentView.objects.update_or_create(
-            content_type=content_type,
-            object_id=issue.pkid,
-            user=user,
-            viewer_ip=viewer_ip,
-            defaults={'last_viewed': timezone.now()}
-        )
+        ContentView.record_view(issue, user, viewer_ip)
         
     def get_client_ip(self) -> str:
         x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR')
