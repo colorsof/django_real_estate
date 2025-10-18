@@ -23,7 +23,8 @@ urlpatterns = [
     path("api/v1/profiles/", include("core_apps.profiles.urls")),
     path("api/v1/apartment/", include("core_apps.apartments.urls")),  # Apartment app URLs
     path("api/v1/issues/", include("core_apps.issues.urls")),  # Issues app URLs
-    path("api/v1/reports/", include("core_apps.reports.urls"))
+    path("api/v1/reports/", include("core_apps.reports.urls")),
+    path("api/v1/ratings/", include("core_apps.ratings.urls")),
 ]
 
 admin.site.site_header = "Real Estate Admin"
