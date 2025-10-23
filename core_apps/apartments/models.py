@@ -20,3 +20,5 @@ class Apartment(TimeStampedModel):
     
     def __str__(self) -> str:
         return f"Apartment {self.unit_number} in Building: {self.building}, Floor: {self.floor}"
+
+    

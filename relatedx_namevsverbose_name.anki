@@ -1,0 +1,936 @@
+Card 1: Basic Definition
+
+  Front:
+  What is the difference between related_name and verbose_name in Django models?
+
+  Back:
+  - related_name: Defines the reverse relationship name for accessing related
+  objects in Python code/ORM
+  - verbose_name: Provides a human-readable label for the field shown in Django
+  Admin, forms, and error messages
+
+  ---
+  Card 2: Usage Context
+
+  Front:
+  Where is related_name used vs verbose_name?
+
+  Back:
+  - related_name: Used in Python code and Django ORM queries
+    - Example: user.ratings_given.all()
+  - verbose_name: Used in Django Admin interface, forms, and UI
+    - Example: Field label shows as "Rating User" instead of "rating_user"
+
+  ---
+  Card 3: Code Example
+
+  Front:
+  Given this model:
+  rating_user = models.ForeignKey(
+      User,
+      related_name="ratings_given",
+      verbose_name=_("Rating User")
+  )
+  How do you access all ratings a user has given?
+
+  Back:
+  user.ratings_given.all()
+  (Use the related_name, not the verbose_name)
+
+  ---
+  Card 4: Audience
+
+  Front:
+  Who is the intended audience for related_name vs verbose_name?
+
+  Back:
+  - related_name: Developers (used in code)
+  - verbose_name: End users and administrators (used in UI)
+
+  ---
+  Card 5: Django Admin
+
+  Front:
+  What will appear as the field label in Django Admin for this field?
+  rating_user = models.ForeignKey(
+      User,
+      related_name="ratings_given",
+      verbose_name=_("Rating User")
+  )
+
+  Back:
+  "Rating User" (the verbose_name)
+
+  The related_name is not visible in the admin interface.
+
+  ---
+  Card 6: Optional or Required?
+
+  Front:
+  Are related_name and verbose_name required in Django ForeignKey fields?
+
+  Back:
+  Both are optional:
+  - related_name: Django auto-generates one (usually modelname_set)
+  - verbose_name: Defaults to the field name with underscores replaced by spaces
+
+  Example: rating_user becomes "rating user" by default
+
+  ---
+  Card 7: Reverse Query Example
+
+  Front:
+  For these two ForeignKeys, what are the reverse accessors?
+  rated_user = models.ForeignKey(
+      User, related_name="ratings_received"
+  )
+  rating_user = models.ForeignKey(
+      User, related_name="ratings_given"
+  )
+
+  Back:
+  user.ratings_received.all()  # Ratings this user received
+  user.ratings_given.all()     # Ratings this user gave
+
+  ---
+  Card 8: Internationalization
+
+  Front:
+  What does the _() function do around verbose_name values?
+  verbose_name=_("Rating User")
+
+  Back:
+  It marks the string for internationalization (i18n), allowing Django to
+  translate it into different languages based on the user's locale.
+
+  Imported from: from django.utils.translation import gettext_lazy as _
+
+
+
+
+
+
+
+
+
+
+
+
+Card 1: Basic Rule
+
+  Front:
+  When should you override the save() method in a Django model?
+
+  Back:
+  Override save() when you need custom behavior that happens EVERY TIME the
+  model is saved, regardless of how it's saved (admin, API, shell, etc.).
+
+  Always remember to call super().save(*args, **kwargs) to actually save to the
+  database!
+
+  ---
+  Card 2: Common Reasons (Part 1)
+
+  Front:
+  What are 4 common reasons to override the save() method?
+
+  Back:
+  1. Auto-generate fields - self.slug = slugify(self.title)
+  2. Validation - if not valid: raise ValueError()
+  3. Calculate derived fields - self.total = price * quantity
+  4. Normalize data - self.email = self.email.lower()
+
+  ---
+  Card 3: Common Reasons (Part 2)
+
+  Front:
+  Besides field manipulation, what are 3 other reasons to override save()?
+
+  Back:
+  1. Track changes - Send notification if a field changed
+  2. Enforce permissions - Only allow certain users to save
+  3. Trigger side effects - Create related objects, send emails after saving
+
+  ---
+  Card 4: When NOT to Override
+
+  Front:
+  Name 4 scenarios where you should NOT override save() and what to use instead.
+
+  Back:
+  1. Simple validation → Use field validators=[...]
+  2. Default values → Use default= parameter
+  3. Auto timestamps → Use auto_now=True
+  4. Post-save actions → Use Django signals (@receiver(post_save))
+
+  ---
+  Card 5: Real Example - Validation
+
+  Front:
+  What does this custom save() method do?
+  def save(self, *args, **kwargs):
+      if not self.author.is_tenant:
+          raise ValueError("Only tenants can post")
+      super().save(*args, **kwargs)
+
+  Back:
+  Enforces a business rule: Only tenants can create posts.
+
+  - Validates BEFORE saving
+  - Raises error if validation fails
+  - Calls super().save() to actually save if validation passes
+
+  ---
+  Card 6: Real Example - Auto-calculation
+
+  Front:
+  What does this custom save() method do?
+  def save(self, *args, **kwargs):
+      self.update_reputation()
+      super().save(*args, **kwargs)
+
+  Back:
+  Auto-calculates a derived field (reputation) before every save.
+
+  Ensures the reputation is always up-to-date whenever the model is saved,
+  regardless of where it's saved from (admin, API, shell).
+
+  ---
+  Card 7: Real Example - Change Tracking
+
+  Front:
+  What does this custom save() method do?
+  def save(self, *args, **kwargs):
+      old_assigned_to = None
+      if self.pk:
+          old_assigned_to = Issue.objects.get(pk=self.pk).assigned_to
+
+      super().save(*args, **kwargs)
+
+      if old_assigned_to != self.assigned_to:
+          send_notification_email(self.assigned_to)
+
+  Back:
+  Tracks field changes and triggers side effects:
+
+  1. Saves old value of assigned_to field
+  2. Saves the model to database
+  3. Compares old vs new value
+  4. Sends email notification if assignment changed
+
+  ---
+  Card 8: What Happens Without super().save()?
+
+  Front:
+  What happens if you override save() but forget to call super().save(*args, 
+  **kwargs)?
+
+  Back:
+  Nothing gets saved to the database!
+
+  def save(self, *args, **kwargs):
+      print("Saving...")
+      # Oops! No super().save() call
+
+  post.save()  # Prints "Saving..." but post is NOT in database!
+
+  Your custom logic runs, but the actual database INSERT/UPDATE never happens.
+
+  ---
+  Card 9: Decision Tree Question 1
+
+  Front:
+  You need to automatically generate a slug from the title every time a Post is
+  saved. Should you override save()?
+
+  Back:
+  Maybe, but better alternatives exist:
+
+  Option 1 (Better): Use AutoSlugField
+  slug = AutoSlugField(populate_from='title')
+
+  Option 2: Override save()
+  def save(self, *args, **kwargs):
+      if not self.slug:
+          self.slug = slugify(self.title)
+      super().save(*args, **kwargs)
+
+  Use save() override only if AutoSlugField doesn't meet your needs.
+
+  ---
+  Card 10: Decision Tree Question 2
+
+  Front:
+  You want to send a welcome email after a User is created. Should you override
+  save()?
+
+  Back:
+  No - use Django signals instead!
+
+  from django.db.models.signals import post_save
+  from django.dispatch import receiver
+
+  @receiver(post_save, sender=User)
+  def send_welcome_email(sender, instance, created, **kwargs):
+      if created:  # Only for new users
+          send_email(instance.email)
+
+  Why signals? Separates concerns - email logic doesn't clutter the model. Also
+  works when objects are created in bulk.
+
+  ---
+  **Card 11: The *args, kwargs Pattern
+
+  Front:
+  Why do we pass *args, **kwargs to super().save() when overriding?
+
+  Back:
+  To forward optional arguments that Django's save method can accept:
+
+  super().save(*args, **kwargs)
+
+  Common arguments:
+  - update_fields=['title'] - Only update specific fields
+  - force_insert=True - Force INSERT instead of UPDATE
+  - using='other_db' - Specify which database
+
+  Without forwarding these, those features break!
+
+  ---
+  Card 12: Simple Data Storage
+
+  Front:
+  Should these models override save()?
+  - Rating model (stores user ratings)
+  - Apartment model (stores apartment data)
+  - Simple User model (just auth)
+
+  Back:
+  No - they don't need custom save() methods.
+
+  These are simple data storage models with:
+  - No complex calculations
+  - No business rule validations
+  - No side effects needed
+  - No field dependencies
+
+  Django's default save() is sufficient!
+
+  ---
+  Card 13: Pattern Recognition
+
+  Front:
+  Identify if these need custom save():
+
+  A) Model that stores book titles and ISBNs
+  B) Model that calculates total price from quantity × unit_price
+  C) Model that needs to prevent non-staff from creating records
+
+  Back:
+  A) No - Simple data storage
+  B) Yes - Auto-calculate derived field
+  C) Yes - Enforce business rule/permission
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  Card 1: Basic Syntax
+
+  Front:
+  What do the three arguments in getattr(user, "profile", None) represent?
+
+  Back:
+  1. user - The object to inspect (variable, no quotes)
+  2. "profile" - The attribute name to look for (string, in quotes)
+  3. None - Default value returned if attribute doesn't exist
+
+  The attribute name MUST be a string!
+
+  ---
+  Card 2: Why Use String?
+
+  Front:
+  Why is "profile" in quotes but user is not in this code?
+  profile = getattr(user, "profile", None)
+
+  Back:
+  - user - Variable (the actual User object)
+  - "profile" - String (the name of the attribute to lookup)
+
+  getattr() looks up attributes dynamically by name, so the second argument must
+   be a string telling it which attribute to find.
+
+  ---
+  Card 3: Equivalent Code
+
+  Front:
+  What are three equivalent ways to write this?
+  profile = getattr(user, "profile", None)
+
+  Back:
+  # Option 1: Using getattr (cleanest)
+  profile = getattr(user, "profile", None)
+
+  # Option 2: Using hasattr
+  profile = user.profile if hasattr(user, "profile") else None
+
+  # Option 3: Using try/except
+  try:
+      profile = user.profile
+  except AttributeError:
+      profile = None
+
+  ---
+  Card 4: Why Not Direct Access?
+
+  Front:
+  What's the problem with using user.profile directly instead of getattr(user, 
+  "profile", None)?
+
+  Back:
+  Direct access crashes if the attribute doesn't exist:
+
+  # UNSAFE - crashes if no profile
+  profile = user.profile  # AttributeError!
+
+  # SAFE - returns None if no profile
+  profile = getattr(user, "profile", None)
+
+  This is important for OneToOne relationships that might not exist yet.
+
+  ---
+  Card 5: Real-World Use Case
+
+  Front:
+  Why is getattr() used in this permission check?
+  profile = getattr(user, "profile", None)
+  if profile and profile.occupation == Profile.Occupation.TENANT:
+      return True
+
+  Back:
+  Defensive programming - safely handles cases where:
+  - User might not have a profile yet
+  - OneToOne relationship might not be created
+  - Prevents AttributeError crashes
+  - Gracefully returns None and skips the check
+
+  Without it, the code would crash for users without profiles!
+
+  ---
+  Card 6: Dynamic Attribute Access
+
+  Front:
+  What does this code do?
+  attr_name = "email"
+  value = getattr(user, attr_name)
+
+  Back:
+  Dynamically accesses an attribute by name:
+
+  Gets user.email using a variable that contains the attribute name.
+
+  Equivalent to:
+  value = user.email
+
+  This is useful when you don't know the attribute name until runtime!
+
+  ---
+  Card 7: Common Mistake
+
+  Front:
+  What's wrong with this code?
+  profile_attr = "profile"
+  value = getattr(user, profile_attr, None)  # ← No quotes!
+
+  Back:
+  Nothing is wrong! This is actually correct.
+
+  When using a variable, you don't use quotes:
+  # Correct - variable contains the string
+  attr = "profile"
+  getattr(user, attr, None)
+
+  # Correct - direct string
+  getattr(user, "profile", None)
+
+  # WRONG - quotes around variable name
+  getattr(user, "attr", None)  # Looks for user.attr, not user.profile!
+
+  ---
+  Card 8: With vs Without Default
+
+  Front:
+  What's the difference between these two?
+  # A
+  profile = getattr(user, "profile", None)
+
+  # B
+  profile = getattr(user, "profile")
+
+  Back:
+  A - Returns None if profile doesn't exist (SAFE)
+  B - Raises AttributeError if profile doesn't exist (CRASHES)
+
+  # With default (safe)
+  profile = getattr(user, "profile", None)
+  print(profile)  # None if doesn't exist
+
+  # Without default (crashes)
+  profile = getattr(user, "profile")  # AttributeError!
+
+  Always use a default value for safety!
+
+  ---
+  Card 9: Chaining Safely
+
+  Front:
+  What's the safe way to access user.profile.occupation when profile might not
+  exist?
+
+  Back:
+  # Safe approach using getattr
+  profile = getattr(user, "profile", None)
+  if profile:
+      occupation = profile.occupation
+
+  # Or one-liner
+  occupation = getattr(getattr(user, "profile", None), "occupation", None)
+
+  # UNSAFE - crashes if no profile
+  occupation = user.profile.occupation  # AttributeError!
+
+  ---
+  Card 10: When to Use getattr()
+
+  Front:
+  When should you use getattr() instead of direct attribute access?
+
+  Back:
+  Use getattr() when:
+  1. Attribute might not exist (OneToOne relationships, optional fields)
+  2. Attribute name is dynamic (stored in a variable)
+  3. You want to avoid crashes (defensive programming)
+  4. You need a default value if attribute is missing
+
+  Don't use it for attributes you know exist (unnecessary overhead).
+
+  ---
+  Card 11: OneToOne Relationship Context
+
+  Front:
+  Why might user.profile not exist even with a OneToOne relationship?
+
+  Back:
+  OneToOne relationships are not automatically created:
+
+  class Profile(models.Model):
+      user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+  # User exists, but profile might not be created yet
+  user = User.objects.create(username="john")
+  # user.profile doesn't exist yet! ← Would crash
+
+  # Profile must be explicitly created
+  Profile.objects.create(user=user)
+  # Now user.profile exists
+
+  This is why getattr(user, "profile", None) is safer!
+
+  ---
+  Card 12: Practice Question
+
+  Front:
+  Fix this code to prevent crashes when profile doesn't exist:
+  def has_permission(self, request, view):
+      user = request.user
+      if user.profile.occupation == Profile.Occupation.TENANT:
+          return True
+      return False
+
+  Back:
+  def has_permission(self, request, view):
+      user = request.user
+      profile = getattr(user, "profile", None)
+      if profile and profile.occupation == Profile.Occupation.TENANT:
+          return True
+      return False
+
+  Key changes:
+  1. Use getattr() to safely get profile
+  2. Check if profile before accessing .occupation
+
+
+
+
+
+
+
+
+
+
+  Card 1: Basic Purpose
+
+  Front:
+  What are the two main purposes of double underscores (__) in Django queries?
+
+  Back:
+  1. Relationship traversal - Navigate through related models
+    - author__username = access username of related author
+  2. Field lookups - Comparison/filter operations
+    - price__gt=100 = price greater than 100
+
+  Can be combined: author__username__icontains="john"
+
+  ---
+  Card 2: Relationship Traversal
+
+  Front:
+  What does tags__name mean in this filter?
+  field_name="tags__name"
+
+  Back:
+  Relationship traversal: Navigate from Post model → through tags relationship →
+   to the name field of Tag model.
+
+  Equivalent to: post.tags.name
+
+  Post
+   └─ tags (relationship)
+       └─ Tag
+           └─ name ← Access this field
+
+  ---
+  Card 3: ForeignKey Traversal
+
+  Front:
+  What does author__username mean?
+  field_name="author__username"
+
+  Back:
+  Traverse through ForeignKey: Post → author (User) → username field
+
+  Post
+   └─ author (ForeignKey)
+       └─ User
+           └─ username ← Access this field
+
+  Equivalent Python: post.author.username
+
+  ---
+  Card 4: Field Lookup Examples
+
+  Front:
+  What do these field lookups mean?
+  - price__gt=100
+  - name__icontains="django"
+  - date__lte=today
+
+  Back:
+  - price__gt=100 → price > 100 (greater than)
+  - name__icontains="django" → name contains "django" (case-insensitive)
+  - date__lte=today → date <= today (less than or equal)
+
+  The __ separates the field from the comparison operator.
+
+  ---
+  Card 5: Common Lookup Expressions
+
+  Front:
+  Name 6 common Django lookup expressions with __
+
+  Back:
+  1. __gt / __lt - Greater than / Less than
+  2. __gte / __lte - Greater/Less than or equal
+  3. __exact - Exact match
+  4. __iexact - Case-insensitive exact match
+  5. __contains / __icontains - Contains (case-sensitive/insensitive)
+  6. __in - In a list of values
+  7. __isnull - Is NULL
+
+  Example: username__icontains="john"
+
+  ---
+  Card 6: Chaining - Traversal + Lookup
+
+  Front:
+  Break down what this query does:
+  Post.objects.filter(author__username__icontains="john")
+
+  Back:
+  Three parts separated by __:
+
+  1. author - Traverse to User model (ForeignKey)
+  2. username - Access username field of User
+  3. icontains - Case-insensitive contains lookup
+
+  Result: Posts where author's username contains "john" (case-insensitive)
+
+  ---
+  Card 7: Multiple Relationships
+
+  Front:
+  What does this deeply nested query mean?
+  Post.objects.filter(author__profile__city__icontains="New York")
+
+  Back:
+  Chain of relationships:
+
+  Post
+   └─ author (User)
+       └─ profile (Profile)
+           └─ city (CharField)
+               └─ icontains lookup
+
+  Finds posts where author's profile city contains "New York"
+
+  Python equivalent: post.author.profile.city
+
+  ---
+  Card 8: Filter with Relationship
+
+  Front:
+  Given this model:
+  class Post(models.Model):
+      tags = TaggableManager()
+      author = models.ForeignKey(User)
+
+  Write a query to find posts with tags containing "python".
+
+  Back:
+  Post.objects.filter(tags__name__icontains="python")
+
+  Breakdown:
+  - tags - Traverse to Tag model
+  - name - Tag's name field
+  - icontains - Case-insensitive contains
+
+  ---
+  Card 9: django-filters Context
+
+  Front:
+  What does this filter configuration do?
+  author_username = django_filters.CharFilter(
+      field_name="author__username",
+      lookup_expr="icontains"
+  )
+
+  Back:
+  Creates a filter that searches for posts by author username with
+  case-insensitive partial matching.
+
+  - field_name="author__username" - Traverse Post → User → username
+  - lookup_expr="icontains" - Case-insensitive contains
+
+  URL usage: /api/posts/?author_username=john
+
+  ---
+  Card 10: SQL Equivalent
+
+  Front:
+  What SQL does Post.objects.filter(author__username__icontains="john")
+  generate?
+
+  Back:
+  SELECT * FROM posts
+  JOIN users ON posts.author_id = users.id
+  WHERE LOWER(users.username) LIKE LOWER('%john%')
+
+  Django automatically:
+  1. Joins the related table (users)
+  2. Applies the condition on the related field
+  3. Makes it case-insensitive with icontains
+
+  ---
+  Card 11: Comparison Lookups
+
+  Front:
+  Match the lookup to its meaning:
+  - field__gt
+  - field__gte
+  - field__lt
+  - field__lte
+
+  Back:
+  - field__gt → Greater than (>)
+  - field__gte → Greater than or equal (>=)
+  - field__lt → Less than (<)
+  - field__lte → Less than or equal (<=)
+
+  Example: price__gte=50 finds items with price >= 50
+
+  ---
+  Card 12: Contains vs icontains
+
+  Front:
+  What's the difference between these?
+  # A
+  Post.objects.filter(title__contains="Django")
+
+  # B
+  Post.objects.filter(title__icontains="Django")
+
+  Back:
+  A (contains) - Case-sensitive
+  - Matches: "Django Tutorial"
+  - Doesn't match: "django tutorial"
+
+  B (icontains) - Case-insensitive
+  - Matches: "Django Tutorial", "django tutorial", "DJANGO guide"
+
+  The i prefix means "ignore case"
+
+  ---
+  Card 13: Field Lookup on Annotated Field
+
+  Front:
+  What does this query do?
+  queryset.annotate(
+      replies_count=Count("replies")
+  ).filter(replies_count__gt=0)
+
+  Back:
+  1. Annotate: Add a computed field replies_count (count of replies)
+  2. Filter with lookup: Keep only posts where replies_count > 0
+
+  The __gt is a field lookup meaning "greater than"
+
+  Result: Posts with at least one reply
+
+  ---
+  Card 14: Lookup Types - String
+
+  Front:
+  Name 4 string-related lookup expressions with examples.
+
+  Back:
+  1. __contains - Case-sensitive contains
+    - title__contains="Django"
+  2. __icontains - Case-insensitive contains
+    - title__icontains="django"
+  3. __startswith - Starts with
+    - username__startswith="admin"
+  4. __endswith - Ends with
+    - email__endswith="@gmail.com"
+
+  All have i variants for case-insensitive!
+
+  ---
+  Card 15: Lookup Types - Other
+
+  Front:
+  What do these lookups do?
+  # A
+  User.objects.filter(email__isnull=True)
+
+  # B  
+  Post.objects.filter(id__in=[1, 2, 3])
+
+  # C
+  Profile.objects.filter(age__range=(18, 65))
+
+  Back:
+  A - Users with no email (NULL)
+  B - Posts with ID 1, 2, or 3 (IN clause)
+  C - Profiles with age between 18 and 65 (BETWEEN)
+
+  Other useful lookups: __isnull, __in, __range
+
+  ---
+  Card 16: Read the Chain
+
+  Front:
+  Practice reading this chain from left to right:
+  tags__name__icontains
+
+  Back:
+  Read as: "tags → name → icontains"
+
+  1. tags - Start at tags relationship
+  2. name - Access the name field of Tag
+  3. icontains - Case-insensitive contains filter
+
+  Rule: Left to right, last part is usually the lookup type.
+
+  ---
+  Card 17: Without vs With Lookup
+
+  Front:
+  What's the difference?
+  # A
+  Post.objects.filter(author__username="john")
+
+  # B
+  Post.objects.filter(author__username__exact="john")
+
+  Back:
+  No difference! Both are exact matches.
+
+  When no lookup is specified, Django uses __exact by default.
+
+  field="value"  ===  field__exact="value"
+
+  ---
+  Card 18: Common Mistake
+
+  Front:
+  What's wrong with this?
+  # Trying to filter by author's username
+  Post.objects.filter(author="john")
+
+  Back:
+  Wrong! This tries to match the entire User object, not the username.
+
+  Correct:
+  Post.objects.filter(author__username="john")
+
+  Must traverse to the username field using __.
+
+  ---
+  Card 19: django-filters Complete Example
+
+  Front:
+  Given this filter:
+  tags = django_filters.ModelMultipleChoiceFilter(
+      field_name="tags__name",
+      lookup_expr="icontains"
+  )
+
+  What query does /api/posts/?tags=python generate?
+
+  Back:
+  Post.objects.filter(tags__name__icontains="python")
+
+  Finds posts where any tag's name contains "python" (case-insensitive).
+
+  django-filters combines field_name + lookup_expr automatically!
+
+  ---
+  Card 20: Reverse Relationship
+
+  Front:
+  If Post has ForeignKey to User via author, how do you query all posts by a
+  specific user from the User object?
+
+  Back:
+  # Using reverse relationship
+  user.posts.all()  # Uses related_name="posts"
+
+  # Or using filter with reverse lookup
+  Post.objects.filter(author=user)
+
+  # Or with username
+  Post.objects.filter(author__username="john")
+
+  The __ works in both directions!
