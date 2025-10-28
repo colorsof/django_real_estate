@@ -32,16 +32,17 @@ class PostListAPIView(generics.ListAPIView):
     serializer_class = PostSerializer
     filterset_class = PostFilter
     pagination_class = StandardResultsSetPagination
-    permission_classes = [permissions.AllowAny] #why is it in []
+    permission_classes = [permissions.AllowAny]
     renderer_classes = [GenericJSONRenderer]
     object_label = "posts"
-    
-    def get_query_set(self):
+
+    def get_queryset(self):
         return Post.objects.annotate(replies_count=Count("replies")).order_by(
-            "-upvotes","-created_at"
+            "-upvotes", "-created_at"
         )
     
-class MyPostListAPIView(generics.ListAPIVies):  #why 2 similar classes
+class MyPostListAPIView(generics.ListAPIView
+                        ):  #why 2 similar classes
     serializer_class = PostSerializer
     filterset_class = PostFilter
     renderer_classes = [GenericJSONRenderer]
@@ -164,21 +165,21 @@ class BookmarkedPostListAPIView(generics.ListAPIView):
         renderer_classes = [GenericJSONRenderer]
         object_label = "bookmarked_posts"
         
-        def get_queryset(sekf):
-            user = user.request.user
+        def get_queryset(self):
+            user = self.request.user
             return Post.objects.filter(bookmarked_by=user)
         
 class ReplyCreateAPIView(generics.CreateAPIView):
-        queryset = Reply.objects.all()
-        serializer_class = ReplySerializer
-        renderer_classes = [GenericJSONRenderer]
-        object_label = "reply"
-        
-        def perform_create(self, serializer):
-            post_id = self.kwargs.get("post_id")  #why _id instead of .pkid
-            post = get_object_or_404(Post, id=post_id)
-            user = self.request.user
-            serializer.save(author=user, post=post) #why no space between post and post
+    queryset = Reply.objects.all()
+    serializer_class = ReplySerializer
+    renderer_classes = [GenericJSONRenderer]
+    object_label = "reply"
+
+    def perform_create(self, serializer):
+        post_id = self.kwargs.get("post_id")
+        post = get_object_or_404(Post, id=post_id)
+        user = self.request.user
+        serializer.save(author=user, post=post)
             
 class ReplyListAPIView(generics.ListAPIView):
     serializer_class = ReplySerializer

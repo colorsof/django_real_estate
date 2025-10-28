@@ -11,7 +11,7 @@ User = get_user_model
 class CanCreateEditPost(permissions.BasePermission):
     message = "You do nor have permission to create or edit this post"
     
-    def has_permission(self, request:Request, view:View) -> bool;
+    def has_permission(self, request: Request, view: View) -> bool:
         user = request.user
         if not user or not user.is_authenticated:
             self.message = "Authentication is required to access this resource"

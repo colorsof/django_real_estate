@@ -42,6 +42,6 @@ urlpatterns = [
     path("<uuid:post_id>/reply/", ReplyCreateAPIView.as_view(), name="create-reply"),
     path("<uuid:post_id>/replies/", ReplyListAPIView.as_view(), name="reply-list"),
     path("<uuid:post_id>/upvote/", UpvotePostAPIView.as_view(), name="upvote-post"),
-    path("<uuid:post_id>/downvote", DownvotePostAPIView.as_view(), name="downvote-post"),
+    path("<uuid:post_id>/downvote/", DownvotePostAPIView.as_view(), name="downvote-post"),
     
 ]

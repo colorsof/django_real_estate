@@ -7,7 +7,7 @@ from .models import Post
 class PostFilter(django_filters.FilterSet):
     tags = django_filters.ModelMultipleChoiceFilter(
         field_name="tags__name",
-        to_field_name="name"
+        to_field_name="name",
         queryset=Tag.objects.all(),
         lookup_expr = "icontains"
     )

@@ -17,9 +17,12 @@ class Post(TimeStampedModel):
     slug = AutoSlugField(populate_from="title", unique=True)
     body = models.TextField(verbose_name=_("Post"))
     tags = TaggableManager()
-    author = models.ForeignKey(User, verbose_name=_("Author"))
-    on_delete = models.CASCADE, related_name="posts"
-    bookmarked_by = models.ManyToManyField(User  related_name="bookmarked_posts", blank=True)
+    author = models.ForeignKey(
+        User, verbose_name=_("Author"), on_delete = models.CASCADE, related_name="posts")
+    
+    bookmarked_by = models.ManyToManyField(
+        User, related_name="bookmarked_posts", blank=True
+    )
     upvotes = models.PositiveIntegerField(default=0, verbose_name=_("Upvotes"))
     upvoted_by=models.ManyToManyField(User, related_name="upvoted_posts", blank=True)
     downvotes = models.PositiveIntegerField(default=0, verbose_name=_("Downvotes"))

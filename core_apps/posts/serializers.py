@@ -20,7 +20,7 @@ class PopularTagSerializer(serializers.ModelSerializer):
 class TopPostSerializer(serializers.ModelSerializer):
     author_username = serializers.ReadOnlyField(source="author.username")
     replies_count = serializers.IntegerField(read_only=True)
-    view_count = serializers.IntegerField(read_onlu=True)
+    view_count = serializers.IntegerField(read_only=True)
     avatar = serializers.SerializerMethodField()
     
     
@@ -45,13 +45,12 @@ class TopPostSerializer(serializers.ModelSerializer):
 
 class ReplySerializer(serializers.ModelSerializer):
     author_username = serializers.ReadOnlyField(source="author.username")
-    post = serializers.PrimaryKeyRelatedField(read_only=True) #primarykeyrelatedfield
+    post = serializers.PrimaryKeyRelatedField(read_only=True)
     avatar = serializers.SerializerMethodField()
-    
-    
+
     class Meta:
         model = Reply
-        fields = {
+        fields = [
             "id",
             "post",
             "author_username",
@@ -59,18 +58,18 @@ class ReplySerializer(serializers.ModelSerializer):
             "avatar",
             "created_at",
             "updated_at",
-        }
+        ]
         read_only_fields = [
             "id",
             "author_username",
             "created_at",
             "updated_at",
         ]
-        
-        def get_avatar(self, obj) -> str | None:    #obj
-            if obj.author.profile.avatar:
-                return obj.author.profile.avatar.url
-            return None
+
+    def get_avatar(self, obj) -> str | None:
+        if obj.author.profile.avatar:
+            return obj.author.profile.avatar.url
+        return None
         
 class UpvotePostSerializer(serializers.ModelSerializer):
     class Meta:
@@ -108,13 +107,13 @@ class DownvotePostSerializer(serializers.ModelSerializer):
         return instance
 
 class BasePostSerializer(serializers.ModelSerializer):
-    author_username = serializers.ReadOnlyField("source=author.username")
+    author_username = serializers.ReadOnlyField(source="author.username")
     is_bookmarked = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
     updated_at = serializers.SerializerMethodField()
     view_count = serializers.SerializerMethodField()
     is_upvoted = serializers.SerializerMethodField()
-    replies_count = serializers.SerializerMethodField()
+    replies_count = serializers.IntegerField(read_only=True)
     avatar = serializers.SerializerMethodField()
     
     class Meta:
@@ -144,10 +143,10 @@ class BasePostSerializer(serializers.ModelSerializer):
         
     def get_avatar(self, obj) -> str | None:
             if obj.author.profile.avatar:
-                return obj.aauthor.profile.avatar.url
+                return obj.author.profile.avatar.url
             return None
         
-    def is_bookmarked(self, obj) -> bool:  #what is this obj we are passing
+    def get_is_bookmarked(self, obj) -> bool:  #what is this obj we are passing
             user = self.context["request"].user
             if user.is_authenticated:
                 return obj.bookmarked_by.filter(id=user.id).exists() 
@@ -180,7 +179,7 @@ class PostSerializer(TaggitSerializer, BasePostSerializer):
     replies = ReplySerializer(many=True, read_only=True)
     
     class Meta(BasePostSerializer.Meta): #what the hell is meta
-        fields = BasePostSerializer.Meta.fields = ["body", "tags", "replies"]
+        fields = BasePostSerializer.Meta.fields + ["body", "tags", "replies"]
         
     def create(self, validated_data) -> Post: #is this validated data from tokens
         tags = validated_data.pop("tags")
@@ -202,7 +201,7 @@ class PostByTagSerializer(TaggitSerializer, BasePostSerializer):
     tags = TagListSerializerField()
     
     class Meta(BasePostSerializer.Meta):
-        fields = BasePostSerializer.Meta.fields +["body", "tags"]
+        fields = BasePostSerializer.Meta.fields + ["body", "tags"]
               
 
         
