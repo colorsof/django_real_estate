@@ -1,0 +1,35 @@
+SESSION COMPLETE
+Time spent: ___ hours
+
+What I Built:
+[Feature name and status]
+
+Biggest Struggle:
+[The moment you were most confused - note timestamp if you remember]
+
+Biggest "Aha!" Moment:
+[When it clicked - note timestamp if you remember]
+
+Most Helpful Claude Prompts:
+1. [The question that unlocked understanding]
+2. [The follow-up that clarified confusion]
+3. [The debugging prompt that found the issue]
+
+What I Actually Learned (not just built):
+[The deep understanding, not just "I made X work"]
+
+Concept Mastery (1-5):
+[New concept]: ___/5 (1=confused, 5=can explain to others)
+
+Status: [ ] Feature Complete [ ] Partial [ ] Blocked
+
+If blocked, what's the issue:
+[What you'll tackle next session]
+
+---
+
+VOICEOVER NOTES (for later):
+Key moments to include in video:
+- Timestamp ~___: [Description of moment]
+- Timestamp ~___: [Description of moment]
+- Timestamp ~___: [Description of moment]

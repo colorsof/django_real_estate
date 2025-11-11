@@ -1,0 +1,26 @@
+TODAY'S LEARNING SESSION
+Date: __Oct 28 2025_________
+Course Lecture: #_80__ (Title: configure eslint, prettier, sharp)
+Lecture Length: _19_ minutes
+
+Feature I'm Building: 
+[setup of ESLint, prettier, sharp]
+
+New Concept(s) I'll Encounter:
+[e.g., "Redux, reducers, extraReducers, async actions"]
+
+What I DON'T Know Yet:
+[e.g., "What is Redux? Why use it? How does it connect to Django?"]
+
+Success Looks Like:
+[e.g., "User can login via Next.js frontend, token stored in Redux, persists on refresh"]
+
+
+QUESTIONS TO ASK CLAUDE:
+Before coding:
+1. What is [new concept]? ELI5 then ELI10 then developer explanation
+2. Why does this concept exist? What problem does it solve?
+3. What would break if I didn't use it?
+
+During coding:
+[Leave blank - you'll discover these while coding]
