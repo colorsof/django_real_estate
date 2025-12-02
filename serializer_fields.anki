@@ -1,5 +1,0 @@
-Q: What's the difference between ForeignKey and PrimaryKeyRelatedField in Django REST Framework?
-A: ForeignKey is a database model field that creates a relationship at the database level. PrimaryKeyRelatedField is a serializer field that controls how that relationship is displayed in API responses (shows just the ID).
-
-Q: In DRF serializers, how do you display all fields of a related object instead of just its ID?
-A: Use a nested serializer (e.g., PostSerializer()) instead of PrimaryKeyRelatedField. PrimaryKeyRelatedField only shows the ID (e.g., "post": 42), while a nested serializer shows the full object with all its fields.
